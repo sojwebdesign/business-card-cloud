@@ -1,29 +1,63 @@
 /**
- * Save to Contacts — opens the device contact sheet with name, photo, and fields.
+ * Contact sharing helpers for contact and share pages.
  */
-async function saveToContacts(vcfUrl, fullName) {
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
-        || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
-    // iOS Safari opens the Add Contact sheet when navigating to a vCard URL
-    if (isIOS) {
-        window.location.assign(vcfUrl);
-        return;
-    }
-
-    const response = await fetch(vcfUrl);
+async function fetchVCardFile(vcfUrl, fullName) {
+    const response = await fetch(vcfUrl, { cache: 'no-store' });
     if (!response.ok) throw new Error('Could not load contact file');
 
     const vcf = await response.text();
     const filename = `${(fullName || 'contact').replace(/[^a-z0-9]+/gi, '-').toLowerCase()}.vcf`;
     const blob = new Blob([vcf], { type: 'text/vcard;charset=utf-8' });
     const file = new File([blob], filename, { type: 'text/vcard' });
+    return { file, filename, blob };
+}
 
-    if (navigator.canShare?.({ files: [file] })) {
-        await navigator.share({ files: [file] });
-        return;
+/** Share page — AirDrop / Messages to a nearby iPhone. */
+async function shareContactFile(vcfUrl, fullName) {
+    const { file } = await fetchVCardFile(vcfUrl, fullName);
+
+    if (navigator.share) {
+        try {
+            if (navigator.canShare?.({ files: [file] })) {
+                await navigator.share({ files: [file], title: fullName });
+                return;
+            }
+            await navigator.share({
+                title: fullName,
+                text: `Contact card for ${fullName}`,
+                url: vcfUrl
+            });
+            return;
+        } catch (err) {
+            if (err?.name === 'AbortError') return;
+        }
     }
 
+    const { blob, filename } = await fetchVCardFile(vcfUrl, fullName);
+    downloadBlob(blob, filename);
+}
+
+/** Contact page — open Add Contact without trapping the user on the vCard page. */
+async function saveToContacts(vcfUrl, fullName) {
+    const { file, filename, blob } = await fetchVCardFile(vcfUrl, fullName);
+
+    if (navigator.canShare?.({ files: [file] })) {
+        try {
+            await navigator.share({ files: [file], title: fullName });
+            return;
+        } catch (err) {
+            if (err?.name === 'AbortError') return;
+        }
+    }
+
+    const popup = window.open(vcfUrl, '_blank', 'noopener,noreferrer');
+    if (popup) return;
+
+    downloadBlob(blob, filename);
+}
+
+function downloadBlob(blob, filename) {
     const blobUrl = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = blobUrl;

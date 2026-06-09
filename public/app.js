@@ -59,6 +59,7 @@ function init() {
     bindShareActions();
     bindModal();
     bindPublishModal();
+    bindRecoverModal();
     loadEditFromUrl();
 }
 
@@ -272,6 +273,17 @@ function buildFieldEditor() {
     fieldEditor.appendChild(requiredSection);
     fieldEditor.appendChild(photoSection);
     fieldEditor.appendChild(optionalSection);
+
+    if (publishState.published && publishState.slug && publishState.editKey) {
+        const dangerSection = document.createElement('div');
+        dangerSection.className = 'sidebar-section sidebar-danger-zone';
+        dangerSection.innerHTML = `
+            <h3 class="sidebar-title">Delete card</h3>
+            <p class="helper-text">Permanently remove this card and all its links.</p>
+            <button type="button" class="btn btn-secondary btn-danger" id="deleteCardBtn">Delete this card</button>`;
+        dangerSection.querySelector('#deleteCardBtn').addEventListener('click', deletePublishedCard);
+        fieldEditor.appendChild(dangerSection);
+    }
 
     photoSection.querySelector('#editorChangePhoto')?.addEventListener('click', () => {
         photoSection.querySelector('#editorPhotoInput').click();
@@ -529,17 +541,47 @@ function bindShareActions() {
     document.getElementById('downloadVcfBtn')?.addEventListener('click', downloadVcf);
 }
 
+function compressPhotoForPublish(dataUrl) {
+    if (!dataUrl) return Promise.resolve(null);
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+            const size = 400;
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            const scale = Math.max(size / img.width, size / img.height);
+            const w = img.width * scale;
+            const h = img.height * scale;
+            ctx.drawImage(img, (size - w) / 2, (size - h) / 2, w, h);
+            resolve(canvas.toDataURL('image/jpeg', 0.88));
+        };
+        img.onerror = () => resolve(dataUrl);
+        img.src = dataUrl;
+    });
+}
+
+async function prepareCardDataForPublish() {
+    const payload = structuredClone(cardData);
+    if (payload.photoDataUrl) {
+        payload.photoDataUrl = await compressPhotoForPublish(payload.photoDataUrl);
+    }
+    return payload;
+}
+
 async function publishCard() {
     publishBtn.disabled = true;
     const originalLabel = publishBtn.textContent;
     publishBtn.textContent = publishState.published ? 'Updating…' : 'Publishing…';
 
     try {
+        const payload = await prepareCardDataForPublish();
         const response = await fetch('/business-card/api/cards/publish', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                cardData,
+                cardData: payload,
                 templateId: currentTemplate,
                 slug: publishState.slug || undefined,
                 editKey: publishState.editKey || undefined
@@ -654,6 +696,113 @@ async function copyToClipboard(text, successMessage) {
         showToast(successMessage, 'success');
     } catch {
         showToast('Could not copy — select and copy manually', 'error');
+    }
+}
+
+function bindRecoverModal() {
+    const recoverModal = document.getElementById('recoverModal');
+    const recoverForm = document.getElementById('recoverForm');
+
+    document.getElementById('findCardBtn')?.addEventListener('click', () => {
+        recoverModal?.classList.remove('hidden');
+        const email = document.getElementById('email')?.value?.trim();
+        if (email) document.getElementById('recoverEmail').value = email;
+    });
+
+    document.getElementById('closeRecoverModal')?.addEventListener('click', () => {
+        recoverModal?.classList.add('hidden');
+    });
+
+    recoverModal?.addEventListener('click', (e) => {
+        if (e.target === recoverModal) recoverModal.classList.add('hidden');
+    });
+
+    recoverForm?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('recoverEmail').value.trim();
+        const resultsEl = document.getElementById('recoverResults');
+        const submitBtn = recoverForm.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Looking up…';
+
+        try {
+            const response = await fetch('/business-card/api/cards/recover', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email })
+            });
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.error || 'Lookup failed');
+
+            resultsEl.classList.remove('hidden');
+            resultsEl.innerHTML = '';
+            result.cards.forEach((card) => {
+                const item = document.createElement('div');
+                item.className = 'recover-card-item';
+                item.innerHTML = `
+                    <h3>${escapeHtml(card.fullName)}</h3>
+                    <p class="recover-card-meta">${escapeHtml(card.jobTitle)} · Updated ${new Date(card.updatedAt).toLocaleDateString()}</p>
+                    <div class="recover-card-actions">
+                        <button type="button" class="btn btn-primary" data-action="edit">Open to edit</button>
+                        <button type="button" class="btn btn-secondary" data-action="copy-edit">Copy edit link</button>
+                        <button type="button" class="btn btn-secondary" data-action="copy-share">Copy my card link</button>
+                        <button type="button" class="btn btn-secondary btn-danger" data-action="delete">Delete</button>
+                    </div>`;
+
+                item.querySelector('[data-action="edit"]').addEventListener('click', () => {
+                    window.location.href = card.editUrl;
+                });
+                item.querySelector('[data-action="copy-edit"]').addEventListener('click', () => {
+                    copyToClipboard(card.editUrl, 'Edit link copied');
+                });
+                item.querySelector('[data-action="copy-share"]').addEventListener('click', () => {
+                    copyToClipboard(card.shareUrl, 'My card link copied');
+                });
+                item.querySelector('[data-action="delete"]').addEventListener('click', async () => {
+                    if (!confirm(`Delete ${card.fullName}'s card? This cannot be undone.`)) return;
+                    await deleteCardBySlug(card.slug, card.editUrl);
+                    item.remove();
+                    if (!resultsEl.children.length) {
+                        resultsEl.innerHTML = '<p class="helper-text">No cards found.</p>';
+                    }
+                    showToast('Card deleted', 'success');
+                });
+
+                resultsEl.appendChild(item);
+            });
+        } catch (error) {
+            resultsEl.classList.remove('hidden');
+            resultsEl.innerHTML = `<p class="helper-text">${escapeHtml(error.message)}</p>`;
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Look up cards';
+        }
+    });
+}
+
+function escapeHtml(str) {
+    return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+async function deleteCardBySlug(slug, editUrl) {
+    const key = new URL(editUrl, window.location.origin).searchParams.get('key');
+    const response = await fetch(`/business-card/api/cards/${encodeURIComponent(slug)}?key=${encodeURIComponent(key)}`, {
+        method: 'DELETE'
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || 'Delete failed');
+}
+
+async function deletePublishedCard() {
+    if (!publishState.slug || !publishState.editKey) return;
+    if (!confirm('Delete this card permanently? All links and QR codes will stop working.')) return;
+
+    try {
+        await deleteCardBySlug(publishState.slug, publishState.editUrl);
+        showToast('Card deleted', 'success');
+        resetApp();
+    } catch (error) {
+        showToast(error.message || 'Could not delete card', 'error');
     }
 }
 

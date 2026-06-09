@@ -2,6 +2,11 @@ import type { CardData } from './types';
 
 const COMPANY_NAME = 'Sojern';
 
+export interface VCardOptions {
+    slug?: string;
+    origin?: string;
+}
+
 function escapeVCard(value: string): string {
     return value.replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n');
 }
@@ -20,7 +25,6 @@ function parseName(fullName: string): { family: string; given: string } {
     };
 }
 
-/** Fold long vCard lines per RFC 2425 (75-char limit). */
 function foldLine(line: string): string {
     const maxLen = 75;
     if (line.length <= maxLen) return line;
@@ -34,7 +38,7 @@ function foldLine(line: string): string {
     return chunks.join('\r\n');
 }
 
-function photoLine(photoDataUrl: string | null | undefined): string | null {
+function embeddedPhotoLine(photoDataUrl: string | null | undefined): string | null {
     if (!photoDataUrl) return null;
 
     const match = photoDataUrl.match(/^data:image\/([\w.+-]+);base64,(.+)$/s);
@@ -42,13 +46,15 @@ function photoLine(photoDataUrl: string | null | undefined): string | null {
 
     let type = match[1].toUpperCase();
     if (type === 'JPG') type = 'JPEG';
-    if (type === 'SVG+XML') return null;
+    if (type === 'SVG+XML' || type === 'WEBP') return null;
 
     const base64 = match[2].replace(/\s/g, '');
+    if (base64.length > 120000) return null;
+
     return foldLine(`PHOTO;ENCODING=b;TYPE=${type}:${base64}`);
 }
 
-export function buildVCard(cardData: CardData): string {
+export function buildVCard(cardData: CardData, options: VCardOptions = {}): string {
     const { family, given } = parseName(cardData.fullName);
     const lines = [
         'BEGIN:VCARD',
@@ -59,8 +65,18 @@ export function buildVCard(cardData: CardData): string {
         `ORG:${COMPANY_NAME}`
     ];
 
-    const photo = photoLine(cardData.photoDataUrl);
-    if (photo) lines.push(photo);
+    if (options.slug) {
+        lines.push(`UID:sojern-card-${options.slug}@sojern.design`);
+    }
+
+    lines.push(`REV:${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]}Z`);
+
+    if (options.slug && options.origin && cardData.photoDataUrl) {
+        lines.push(`PHOTO;VALUE=uri:${options.origin}/business-card/${options.slug}/photo`);
+    }
+
+    const embedded = embeddedPhotoLine(cardData.photoDataUrl);
+    if (embedded) lines.push(embedded);
 
     if (cardData.email?.value) {
         lines.push(`EMAIL;TYPE=${cardData.email.label}:${escapeVCard(cardData.email.value)}`);

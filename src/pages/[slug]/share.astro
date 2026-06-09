@@ -25,16 +25,18 @@ const origin = getPublicOrigin(Astro.url.origin, Astro.locals);
 const urls = buildCardUrls(origin, slug, card.editKey);
 const templateId = card.templateId;
 const contactUrl = urls.contactUrl;
+const vcfUrl = urls.vcfUrl;
+const fullName = card.cardData.fullName;
 ---
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{card.cardData.fullName} — Sojern</title>
+    <title>{fullName} — Sojern</title>
     <meta name="robots" content="noindex, nofollow">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content={card.cardData.fullName}>
+    <meta name="apple-mobile-web-app-title" content={fullName}>
     <link rel="apple-touch-icon" href="/business-card/Assets/app-icon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -43,19 +45,27 @@ const contactUrl = urls.contactUrl;
 </head>
 <body class="public-card-page share-card-page">
     <main class="public-card-main">
-        <div id="cardPreviewMount" class="sojern-card-mount public-card-mount"></div>
+        <div class="share-top-panel">
+            <div class="share-qr-panel">
+                <canvas id="shareQrCanvas" width="220" height="220" aria-label="QR code to share contact"></canvas>
+                <p class="share-qr-label">Scan to save my contact</p>
+            </div>
 
-        <div class="share-qr-panel">
-            <canvas id="shareQrCanvas" width="200" height="200" aria-label="QR code to share contact"></canvas>
-            <p class="share-qr-label">Scan to save my contact</p>
+            <button type="button" class="btn btn-primary share-contact-btn" id="shareContactBtn">
+                Share Contact
+            </button>
+            <p class="helper-text share-contact-hint">Send via AirDrop or Messages to a nearby iPhone</p>
         </div>
+
+        <div id="cardPreviewMount" class="sojern-card-mount public-card-mount"></div>
     </main>
 
     <script is:inline src="/business-card/vendor/qrcode.min.js"></script>
     <script is:inline src="/business-card/card-fields.js"></script>
     <script is:inline src="/business-card/card-icons.js"></script>
     <script is:inline src="/business-card/card-templates.js"></script>
-    <script is:inline define:vars={{ cardData: card.cardData, templateId, contactUrl }}>
+    <script is:inline src="/business-card/contact-page.js"></script>
+    <script is:inline define:vars={{ cardData: card.cardData, templateId, contactUrl, vcfUrl, fullName }}>
         const mount = document.getElementById('cardPreviewMount');
         if (mount && window.CardTemplates) {
             window.CardTemplates.render(mount, templateId, cardData);
@@ -64,11 +74,23 @@ const contactUrl = urls.contactUrl;
         const canvas = document.getElementById('shareQrCanvas');
         if (canvas && typeof QRCode !== 'undefined') {
             QRCode.toCanvas(canvas, contactUrl, {
-                width: 200,
+                width: 220,
                 margin: 1,
                 color: { dark: '#242452', light: '#ffffff' }
             });
         }
+
+        document.getElementById('shareContactBtn')?.addEventListener('click', async () => {
+            const btn = document.getElementById('shareContactBtn');
+            btn.disabled = true;
+            try {
+                await shareContactFile(vcfUrl, fullName);
+            } catch (err) {
+                console.error(err);
+            } finally {
+                btn.disabled = false;
+            }
+        });
     </script>
 </body>
 </html>

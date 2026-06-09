@@ -130,6 +130,7 @@
                                     <path d="M5 12h14M12 5l7 7-7 7"/>
                                 </svg>
                             </button>
+                            <button type="button" class="btn btn-secondary" id="findCardBtn">Find my card</button>
                         </div>
                     </form>
                     <div class="home-hints">
@@ -274,6 +275,23 @@
                 <li>Tap <strong>Add</strong> — your card opens like an app</li>
             </ol>
             <p class="helper-text">On Android, use Chrome menu → Add to Home screen.</p>
+        </div>
+    </div>
+
+    <!-- Find / recover card -->
+    <div class="modal-overlay hidden" id="recoverModal">
+        <div class="modal-card modal-card--wide">
+            <button type="button" class="modal-close" id="closeRecoverModal" aria-label="Close">&times;</button>
+            <h2 class="modal-title">Find my card</h2>
+            <p class="modal-text">Enter the email on your card to recover your edit link or delete old cards.</p>
+            <form id="recoverForm" class="recover-form">
+                <div class="form-field">
+                    <label for="recoverEmail">Work email</label>
+                    <input type="email" id="recoverEmail" autocomplete="email" placeholder="name@sojern.com" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Look up cards</button>
+            </form>
+            <div class="recover-results hidden" id="recoverResults"></div>
         </div>
     </div>
 

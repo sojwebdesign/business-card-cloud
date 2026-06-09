@@ -8,7 +8,8 @@ const RESERVED = new Set([
     's',
     'styles.css',
     'app.js',
-    'manifest.webmanifest'
+    'manifest.webmanifest',
+    'photo'
 ]);
 
 export function isReservedSlug(slug: string): boolean {
