@@ -1,24 +1,24 @@
 {
   "name": "Sojern DigiCard",
-  "short_name": "DigiCard",
+  "short_name": "Sojern DigiCard",
   "description": "Digital business card builder for Sojern",
   "start_url": "/business-card/",
   "display": "standalone",
-  "background_color": "#f8f9fa",
+  "background_color": "#242452",
   "theme_color": "#242452",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/business-card/Assets/DigiCard_Favicon_Light.png",
-      "sizes": "512x512",
+      "src": "/business-card/Assets/DigiCard_Shortcut-Icon-180.png",
+      "sizes": "180x180",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/business-card/Assets/DigiCard_Favicon_Dark.png",
-      "sizes": "512x512",
+      "src": "/business-card/Assets/DigiCard_Shortcut-Icon-180.png",
+      "sizes": "180x180",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "maskable"
     }
   ]
 }

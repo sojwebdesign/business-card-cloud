@@ -1,5 +1,8 @@
 /** Sojern DigiCard brand asset paths */
 window.DigiCardBrand = {
+    appName: 'Sojern DigiCard',
+    shortcutIcon: '/business-card/Assets/DigiCard_Shortcut-Icon.png',
+    appleTouchIcon: '/business-card/Assets/DigiCard_Shortcut-Icon-180.png',
     faviconLight: '/business-card/Assets/DigiCard_Favicon_Light.png',
     faviconDark: '/business-card/Assets/DigiCard_Favicon_Dark.png',
     logoLight: '/business-card/Assets/DigiCard-Logo_Light.png',
