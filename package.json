@@ -1,0 +1,21 @@
+{
+  "name": "business-card-cloud",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro build && wrangler dev",
+    "deploy": "webflow cloud deploy",
+    "astro": "astro",
+    "cf-typegen": "wrangler types"
+  },
+  "dependencies": {
+    "@astrojs/cloudflare": "^12.6.6",
+    "astro": "^5.7.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250415.0",
+    "wrangler": "^4.11.1"
+  }
+}

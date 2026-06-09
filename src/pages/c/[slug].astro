@@ -1,0 +1,62 @@
+---
+import { getCardBySlug } from '../../lib/cards-store';
+
+export const prerender = false;
+
+const { slug } = Astro.params;
+if (!slug) {
+    return Astro.redirect('/business-card/');
+}
+
+let card = null;
+try {
+    card = await getCardBySlug(Astro.locals, slug);
+} catch {
+    card = null;
+}
+
+if (!card) {
+    return new Response('Card not found', { status: 404 });
+}
+
+const vcfUrl = `/business-card/c/${slug}.vcf`;
+const templateId = card.templateId;
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{card.cardData.fullName} — Sojern</title>
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content={card.cardData.fullName}>
+    <link rel="apple-touch-icon" href="/business-card/Assets/app-icon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/business-card/styles.css">
+</head>
+<body class="public-card-page">
+    <main class="public-card-main">
+        <div id="cardPreviewMount" class="sojern-card-mount public-card-mount"></div>
+
+        <div class="public-card-actions">
+            <a class="btn btn-primary public-card-save" href={vcfUrl} download>
+                Save to Contacts
+            </a>
+            <p class="helper-text public-card-hint">Opens your phone's contact sheet to add this person.</p>
+        </div>
+    </main>
+
+    <script is:inline src="/business-card/card-fields.js"></script>
+    <script is:inline src="/business-card/card-icons.js"></script>
+    <script is:inline src="/business-card/card-templates.js"></script>
+    <script is:inline define:vars={{ cardData: card.cardData, templateId }}>
+        const mount = document.getElementById('cardPreviewMount');
+        if (mount && window.CardTemplates) {
+            window.CardTemplates.render(mount, templateId, cardData);
+        }
+    </script>
+</body>
+</html>

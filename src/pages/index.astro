@@ -1,0 +1,278 @@
+---
+// Contact Card Builder - Astro page
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Card</title>
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Contact Card">
+    <link rel="manifest" href="/business-card/manifest.webmanifest">
+    <link rel="apple-touch-icon" href="/business-card/Assets/app-icon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/business-card/styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="header">
+            <div class="logo">
+                <span class="logo-text">Contact Card</span>
+            </div>
+            <nav class="nav">
+                <button class="btn btn-secondary hidden" id="startOverBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                        <path d="M3 3v5h5"/>
+                    </svg>
+                    Start Over
+                </button>
+                <div class="download-dropdown hidden" id="downloadDropdown">
+                    <button class="btn btn-primary" id="downloadBtn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7,10 12,15 17,10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        Share
+                        <svg class="dropdown-caret" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6,9 12,15 18,9"/>
+                        </svg>
+                    </button>
+                    <div class="download-menu" id="downloadMenu">
+                        <p class="download-menu-title">Share your card</p>
+                        <button class="btn btn-primary download-confirm" id="publishBtn">Publish Card</button>
+                        <p class="download-menu-hint" id="publishHint">Save your card online to get a live link and QR code.</p>
+                        <div class="download-divider"></div>
+                        <button class="btn btn-secondary download-confirm" id="copyPublicLinkBtn" disabled>Copy public link</button>
+                        <button class="btn btn-secondary download-confirm" id="saveQrBtn" disabled>Save QR to Photos</button>
+                        <div class="download-divider"></div>
+                        <button class="btn btn-secondary download-confirm" id="addToHomeBtn" disabled>Add to Home Screen</button>
+                        <button class="btn btn-secondary download-confirm" id="downloadVcfBtn">Download Contact (.vcf)</button>
+                    </div>
+                </div>
+                <a href="https://sojern.design" class="back-link">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    Return to Sojern Design Hub
+                </a>
+                <div class="theme-toggle" id="themeToggle" title="Toggle dark mode">
+                    <div class="theme-toggle-option active" data-theme="light">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="5"/>
+                            <line x1="12" y1="1" x2="12" y2="3"/>
+                            <line x1="12" y1="21" x2="12" y2="23"/>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                            <line x1="1" y1="12" x2="3" y2="12"/>
+                            <line x1="21" y1="12" x2="23" y2="12"/>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                        </svg>
+                    </div>
+                    <div class="theme-toggle-option" data-theme="dark">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                        </svg>
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        <main class="main">
+            <!-- Screen 1: Basics -->
+            <section class="home-section" id="homeSection">
+                <div class="home-container home-container--wide">
+                    <div class="home-header">
+                        <h1 class="home-title">Build your digital business card</h1>
+                        <p class="home-subtitle">Enter your basics, choose a template, then customize which fields appear on your card.</p>
+                    </div>
+                    <form class="contact-form" id="basicsForm" novalidate>
+                        <div class="form-grid">
+                            <div class="form-field">
+                                <label for="fullName">Full name <span class="required">*</span></label>
+                                <input type="text" id="fullName" autocomplete="name" required placeholder="Meaghan Sandtorv">
+                            </div>
+                            <div class="form-field">
+                                <label for="jobTitle">Job title <span class="required">*</span></label>
+                                <input type="text" id="jobTitle" autocomplete="organization-title" required placeholder="Art Director">
+                            </div>
+                            <div class="form-field form-field-full">
+                                <label for="email">Email <span class="required">*</span></label>
+                                <input type="email" id="email" autocomplete="email" required placeholder="name@sojern.com">
+                            </div>
+                        </div>
+                        <div class="form-field form-field-full">
+                            <label for="photoInput">Headshot (optional)</label>
+                            <div class="photo-upload" id="photoUpload">
+                                <input type="file" id="photoInput" accept="image/jpeg,image/jpg,image/png,image/webp" hidden>
+                                <div class="photo-upload-content" id="photoUploadContent">
+                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <circle cx="12" cy="8" r="4"/>
+                                        <path d="M4 20c0-4 4-6 8-6s8 2 8 6"/>
+                                    </svg>
+                                    <span>Click to upload — you'll crop to a circle next</span>
+                                </div>
+                                <img class="photo-preview hidden" id="photoPreview" alt="Headshot preview">
+                            </div>
+                        </div>
+                        <div class="home-actions">
+                            <button type="submit" class="btn btn-primary">
+                                Continue to Templates
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </form>
+                    <div class="home-hints">
+                        <div class="hint">
+                            <svg width="14" height="14" viewBox="0 0 96 96">
+                                <circle cx="48" cy="48" r="43.81" fill="#e05f3e"/>
+                                <polyline points="22.41 48 38.83 66.11 72.85 34.38" fill="none" stroke="#fff" stroke-linecap="round" stroke-miterlimit="10" stroke-width="11"/>
+                            </svg>
+                            Add to Home Screen for one-tap access at conferences
+                        </div>
+                        <div class="hint">
+                            <svg width="14" height="14" viewBox="0 0 96 96">
+                                <circle cx="48" cy="48" r="43.81" fill="#e05f3e"/>
+                                <polyline points="22.41 48 38.83 66.11 72.85 34.38" fill="none" stroke="#fff" stroke-linecap="round" stroke-miterlimit="10" stroke-width="11"/>
+                            </svg>
+                            Company is always listed as Sojern
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Screen 2: Template selection -->
+            <section class="effect-selection-section hidden" id="templateSelectionSection">
+                <div class="effect-selection-container">
+                    <div class="effect-selection-header">
+                        <h2 class="effect-selection-title">Choose a Template</h2>
+                        <p class="effect-selection-subtitle">Card design for <span id="templateUserName">your card</span></p>
+                    </div>
+                    <div class="effect-options effect-options-row" id="templateGrid"></div>
+                    <div class="effect-selection-actions">
+                        <button type="button" class="btn btn-secondary" id="templateBackBtn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M19 12H5M12 19l-7-7 7-7"/>
+                            </svg>
+                            Edit Basics
+                        </button>
+                        <button type="button" class="btn btn-primary" id="templateContinueBtn">
+                            Customize Card
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Screen 3: Editor -->
+            <section class="editor-section hidden" id="editorSection">
+                <div class="editor-layout">
+                    <aside class="sidebar" id="fieldEditor"></aside>
+
+                    <div class="preview-area">
+                        <div class="preview-wrapper">
+                            <div class="preview-container">
+                                <div id="cardPreviewMount" class="sojern-card-mount"></div>
+                            </div>
+                            <div class="qr-preview-panel">
+                                <canvas id="qrCanvas" width="140" height="140" aria-label="QR code preview"></canvas>
+                                <p class="helper-text" id="qrHint">Publish your card to activate this QR code</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Headshot crop -->
+    <div class="modal-overlay hidden" id="photoCropModal">
+        <div class="modal-card modal-card--crop">
+            <button type="button" class="modal-close" id="photoCropClose" aria-label="Close">&times;</button>
+            <h2 class="modal-title">Crop your headshot</h2>
+            <p class="crop-hint-text">Drag to reposition and use the slider to zoom. Your photo will be cropped to a circle.</p>
+            <div class="crop-canvas-wrap">
+                <canvas id="photoCropCanvas" width="280" height="280" aria-label="Photo crop area"></canvas>
+            </div>
+            <div class="crop-controls">
+                <label for="photoCropZoom">Zoom</label>
+                <div class="crop-zoom-row">
+                    <input type="range" id="photoCropZoom" min="100" max="300" value="100">
+                    <span class="crop-zoom-value" id="photoCropZoomValue">100%</span>
+                </div>
+            </div>
+            <div class="crop-actions">
+                <button type="button" class="btn btn-secondary" id="photoCropCancel">Cancel</button>
+                <button type="button" class="btn btn-primary" id="photoCropApply">Apply</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Publish success -->
+    <div class="modal-overlay hidden" id="publishModal">
+        <div class="modal-card modal-card--wide">
+            <button type="button" class="modal-close" id="closePublishModal" aria-label="Close">&times;</button>
+            <h2 class="modal-title" id="publishModalTitle">Card published</h2>
+            <p class="modal-text">Your card is live. Share the public link or QR — prospects scan it to save your contact.</p>
+
+            <div class="publish-url-block">
+                <label class="sub-label" for="publicUrlInput">Public link (share / QR)</label>
+                <div class="publish-url-row">
+                    <input type="text" class="publish-url-input" id="publicUrlInput" readonly>
+                    <button type="button" class="btn btn-secondary" id="copyPublicUrlBtn">Copy</button>
+                </div>
+            </div>
+
+            <div class="publish-url-block">
+                <label class="sub-label" for="editUrlInput">Edit link (keep private)</label>
+                <div class="publish-url-row">
+                    <input type="text" class="publish-url-input" id="editUrlInput" readonly>
+                    <button type="button" class="btn btn-secondary" id="copyEditUrlBtn">Copy</button>
+                </div>
+                <p class="helper-text">Bookmark this link to update your card later. The public link and QR stay the same.</p>
+            </div>
+
+            <div class="publish-modal-actions">
+                <button type="button" class="btn btn-secondary" id="publishSaveQrBtn">Save QR to Photos</button>
+                <button type="button" class="btn btn-primary" id="publishDoneBtn">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add to Home Screen instructions -->
+    <div class="modal-overlay hidden" id="addToHomeModal">
+        <div class="modal-card">
+            <button type="button" class="modal-close" id="closeHomeModal" aria-label="Close">&times;</button>
+            <h2 class="modal-title">Add to Home Screen</h2>
+            <p class="modal-text">On your <strong>phone</strong>, open your published card in Safari, then:</p>
+            <ol class="modal-steps">
+                <li>Open <a href="#" id="addToHomeCardLink" target="_blank" rel="noopener">your card link</a> on your iPhone</li>
+                <li>Tap the <strong>Share</strong> button (square with arrow)</li>
+                <li>Scroll down and tap <strong>Add to Home Screen</strong></li>
+                <li>Tap <strong>Add</strong> — your card opens like an app</li>
+            </ol>
+            <p class="helper-text">On Android, use Chrome menu → Add to Home screen.</p>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script is:inline src="/business-card/vendor/qrcode.min.js"></script>
+    <script is:inline src="/business-card/card-fields.js"></script>
+    <script is:inline src="/business-card/card-icons.js"></script>
+    <script is:inline src="/business-card/card-templates.js"></script>
+    <script is:inline src="/business-card/photo-crop.js"></script>
+    <script is:inline src="/business-card/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+{
+  "name": "Sojern Contact Card",
+  "short_name": "Contact Card",
+  "description": "Digital business card for Sojern sales",
+  "start_url": "/business-card/",
+  "display": "standalone",
+  "background_color": "#f8f9fa",
+  "theme_color": "#242452",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/business-card/Assets/app-icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

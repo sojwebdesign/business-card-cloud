@@ -1,0 +1,10 @@
+{
+  "cloud": {
+    "framework": "astro"
+  },
+  "telemetry": {
+    "global": {
+      "allowTelemetry": false
+    }
+  }
+}
