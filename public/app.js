@@ -741,10 +741,23 @@ function bindRecoverModal() {
                 item.className = 'recover-card-item';
                 item.innerHTML = `
                     <h3>${escapeHtml(card.fullName)}</h3>
-                    <p class="recover-card-meta">${escapeHtml(card.jobTitle)} · Updated ${new Date(card.updatedAt).toLocaleDateString()}</p>
+                    <p class="recover-card-meta">${escapeHtml(card.jobTitle)}</p>
+                    <p class="recover-card-meta">Last edited: ${escapeHtml(formatRecoverTimestamp(card.updatedAt))}</p>
+                    <p class="recover-card-slug"><span class="recover-card-label">URL slug</span> <code>${escapeHtml(card.slug)}</code></p>
+                    <div class="recover-card-links">
+                        <div class="recover-card-link-row">
+                            <span class="recover-card-label">Contact page</span>
+                            <a class="recover-card-link" href="${escapeHtml(card.contactUrl)}" target="_blank" rel="noopener">${escapeHtml(card.contactUrl)}</a>
+                        </div>
+                        <div class="recover-card-link-row">
+                            <span class="recover-card-label">My card</span>
+                            <a class="recover-card-link" href="${escapeHtml(card.shareUrl)}" target="_blank" rel="noopener">${escapeHtml(card.shareUrl)}</a>
+                        </div>
+                    </div>
                     <div class="recover-card-actions">
                         <button type="button" class="btn btn-primary" data-action="edit">Open to edit</button>
                         <button type="button" class="btn btn-secondary" data-action="copy-edit">Copy edit link</button>
+                        <button type="button" class="btn btn-secondary" data-action="copy-contact">Copy contact link</button>
                         <button type="button" class="btn btn-secondary" data-action="copy-share">Copy my card link</button>
                         <button type="button" class="btn btn-secondary btn-danger" data-action="delete">Delete</button>
                     </div>`;
@@ -754,6 +767,9 @@ function bindRecoverModal() {
                 });
                 item.querySelector('[data-action="copy-edit"]').addEventListener('click', () => {
                     copyToClipboard(card.editUrl, 'Edit link copied');
+                });
+                item.querySelector('[data-action="copy-contact"]').addEventListener('click', () => {
+                    copyToClipboard(card.contactUrl, 'Contact link copied');
                 });
                 item.querySelector('[data-action="copy-share"]').addEventListener('click', () => {
                     copyToClipboard(card.shareUrl, 'My card link copied');
@@ -782,6 +798,12 @@ function bindRecoverModal() {
 
 function escapeHtml(str) {
     return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function formatRecoverTimestamp(iso) {
+    const date = new Date(iso);
+    if (Number.isNaN(date.getTime())) return 'Unknown';
+    return date.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
 }
 
 async function deleteCardBySlug(slug, editUrl) {
