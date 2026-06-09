@@ -205,8 +205,10 @@ body.editor-open .editor-layout {
 }
 
 .logo-image {
-    height: 40px;
+    display: block;
+    height: 32px;
     width: auto;
+    max-width: 180px;
 }
 
 .logo-light {
@@ -251,14 +253,6 @@ body.editor-open .editor-layout {
 
 [data-theme="dark"] .back-link {
     color: #f8f8f8;
-}
-
-.logo-text {
-    font-family: 'Space Mono', monospace;
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    letter-spacing: -0.02em;
 }
 
 .nav {
@@ -2540,12 +2534,24 @@ body.dark-mode .effect-option-badge {
     white-space: nowrap;
 }
 
+a.sojern-card__contact-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+a.sojern-card__contact-link:hover,
+a.sojern-card__contact-link:focus-visible {
+    text-decoration: underline;
+    color: var(--brand-primary);
+}
+
 .sojern-card__contact-secondary {
     font-family: 'Inter', var(--font-sans);
     font-size: 0.8125rem;
     font-weight: 400;
     color: var(--card-secondary);
     line-height: 1.3;
+    display: block;
 }
 
 /* ─── Field editor sidebar ─── */

@@ -64,13 +64,26 @@ function init() {
 }
 
 function bindTheme() {
-    themeToggle.addEventListener('click', () => {
-        const current = document.documentElement.getAttribute('data-theme');
-        const next = current === 'dark' ? 'light' : 'dark';
-        document.documentElement.setAttribute('data-theme', next);
+    const applyTheme = (theme) => {
+        document.documentElement.setAttribute('data-theme', theme);
         themeToggle.querySelectorAll('.theme-toggle-option').forEach((opt) => {
-            opt.classList.toggle('active', opt.dataset.theme === next);
+            opt.classList.toggle('active', opt.dataset.theme === theme);
         });
+        window.DigiCardBrand?.applyFavicon(theme);
+    };
+
+    const saved = localStorage.getItem('digicard-theme');
+    if (saved === 'dark' || saved === 'light') {
+        applyTheme(saved);
+    } else {
+        applyTheme(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    }
+
+    themeToggle.addEventListener('click', () => {
+        const current = document.documentElement.getAttribute('data-theme') || 'light';
+        const next = current === 'dark' ? 'light' : 'dark';
+        localStorage.setItem('digicard-theme', next);
+        applyTheme(next);
     });
 }
 

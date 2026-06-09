@@ -23,6 +23,27 @@ window.CardTemplates = {
         return Object.values(this.registry);
     },
 
+    getRowHref(fieldId, def, data) {
+        if (!data?.value) return null;
+
+        const value = data.value.trim();
+        if (!value) return null;
+
+        if (def.type === 'contact' && fieldId === 'email') {
+            return `mailto:${value}`;
+        }
+        if (def.type === 'contact' && fieldId === 'phone') {
+            return `tel:${value.replace(/[^\d+]/g, '')}`;
+        }
+        if (def.type === 'link') {
+            if (/^https?:\/\//i.test(value)) return value;
+            if (/^mailto:/i.test(value)) return value;
+            if (/^tel:/i.test(value)) return value;
+            return `https://${value}`;
+        }
+        return null;
+    },
+
     render(container, templateId, cardData) {
         const template = this.getTemplate(templateId);
         const fields = window.CardFields;
@@ -112,14 +133,22 @@ window.CardTemplates = {
             const textWrap = document.createElement('span');
             textWrap.className = 'sojern-card__contact-text';
 
-            const primary = document.createElement('span');
-            primary.className = 'sojern-card__contact-primary';
+            const displayText = row.def.type === 'link'
+                ? fields.getLinkDisplayText(row.data, row.def)
+                : row.data.value;
 
-            if (row.def.type === 'link') {
-                primary.textContent = fields.getLinkDisplayText(row.data, row.def);
-            } else if (row.def.type === 'contact') {
-                primary.textContent = row.data.value;
+            const href = this.getRowHref(row.fieldId, row.def, row.data);
+            const primary = document.createElement(href ? 'a' : 'span');
+            primary.className = 'sojern-card__contact-primary' + (href ? ' sojern-card__contact-link' : '');
+
+            if (href) {
+                primary.href = href;
+                if (row.def.type === 'link') {
+                    primary.target = '_blank';
+                    primary.rel = 'noopener noreferrer';
+                }
             }
+            primary.textContent = displayText;
 
             textWrap.appendChild(primary);
 

@@ -6,14 +6,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Card</title>
+    <title>Sojern DigiCard</title>
     <meta name="robots" content="noindex, nofollow">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="Contact Card">
+    <meta name="apple-mobile-web-app-title" content="DigiCard">
+    <meta name="theme-color" content="#242452">
     <meta name="card-public-origin" content="https://sojern.design">
     <link rel="manifest" href="/business-card/manifest.webmanifest">
-    <link rel="apple-touch-icon" href="/business-card/Assets/app-icon.png">
+    <link rel="icon" type="image/png" href="/business-card/Assets/DigiCard_Favicon_Light.png" media="(prefers-color-scheme: light)">
+    <link rel="icon" type="image/png" href="/business-card/Assets/DigiCard_Favicon_Dark.png" media="(prefers-color-scheme: dark)">
+    <link rel="icon" type="image/png" href="/business-card/Assets/DigiCard_Favicon_Light.png" data-brand-favicon>
+    <link rel="apple-touch-icon" href="/business-card/Assets/DigiCard_Favicon_Light.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -23,7 +27,8 @@
     <div class="app-container">
         <header class="header">
             <div class="logo">
-                <span class="logo-text">Contact Card</span>
+                <img class="logo-image logo-light" src="/business-card/Assets/DigiCard-Logo_Light.png" alt="Sojern DigiCard" width="180" height="32">
+                <img class="logo-image logo-dark" src="/business-card/Assets/DigiCard-Logo_Dark.png" alt="Sojern DigiCard" width="180" height="32">
             </div>
             <nav class="nav">
                 <button class="btn btn-secondary hidden" id="startOverBtn">
@@ -297,6 +302,7 @@
 
     <div class="toast-container" id="toastContainer"></div>
 
+    <script is:inline src="/business-card/brand.js"></script>
     <script is:inline src="/business-card/vendor/qrcode.min.js"></script>
     <script is:inline src="/business-card/card-fields.js"></script>
     <script is:inline src="/business-card/card-icons.js"></script>
