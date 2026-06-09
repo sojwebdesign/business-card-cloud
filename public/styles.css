@@ -2174,7 +2174,8 @@ body.dark-mode .effect-option-badge {
 .form-field input[type="text"],
 .form-field input[type="email"],
 .form-field input[type="tel"],
-.form-field input[type="url"] {
+.form-field input[type="url"],
+.form-field textarea {
     padding: var(--space-2) var(--space-3);
     border: 1px solid var(--border-default);
     border-radius: var(--radius-md);
@@ -2185,7 +2186,14 @@ body.dark-mode .effect-option-badge {
     transition: border-color var(--transition-fast);
 }
 
-.form-field input:focus {
+.form-field textarea {
+    resize: vertical;
+    min-height: 4.5rem;
+    line-height: 1.45;
+}
+
+.form-field input:focus,
+.form-field textarea:focus {
     outline: none;
     border-color: var(--brand-primary);
     box-shadow: 0 0 0 3px rgba(227, 95, 62, 0.12);
@@ -2626,6 +2634,11 @@ body.dark-mode .effect-option-badge {
     white-space: nowrap;
 }
 
+.sojern-card__contact-primary--address {
+    white-space: pre-line;
+    font-weight: 600;
+}
+
 a.sojern-card__contact-link {
     text-decoration: none;
     color: inherit;
@@ -2704,13 +2717,26 @@ a.sojern-card__contact-link:focus-visible {
 .field-toggle-body input[type="text"],
 .field-toggle-body input[type="email"],
 .field-toggle-body input[type="tel"],
-.field-toggle-body input[type="url"] {
+.field-toggle-body input[type="url"],
+.field-toggle-body textarea,
+.field-optional-input {
     padding: var(--space-2) var(--space-3);
     border: 1px solid var(--border-default);
     border-radius: var(--radius-md);
     font-family: var(--font-sans);
     font-size: 0.875rem;
     width: 100%;
+}
+
+.field-toggle-body textarea,
+.field-optional-input[rows] {
+    resize: vertical;
+    min-height: 4.5rem;
+    line-height: 1.45;
+}
+
+.sojern-card__contact:has(.sojern-card__contact-primary--address) .sojern-card__contact-text {
+    margin-top: 0;
 }
 
 .display-mode-options {
@@ -2916,6 +2942,14 @@ a.sojern-card__contact-link:focus-visible {
 
 .contact-card-page .public-card-main {
     gap: var(--space-5);
+}
+
+.public-card-actions--top {
+    order: -1;
+}
+
+.contact-card-page .public-card-actions--top {
+    margin-bottom: var(--space-2);
 }
 
 .modal-close {

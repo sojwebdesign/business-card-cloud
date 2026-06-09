@@ -69,6 +69,7 @@ window.CardTemplates = {
     },
 
     getRowHref(fieldId, def, data) {
+        if (fieldId === 'address') return null;
         if (!data?.value) return null;
 
         const value = data.value.trim();
@@ -182,9 +183,12 @@ window.CardTemplates = {
                 ? fields.getLinkDisplayText(row.data, row.def)
                 : row.data.value;
 
+            const isAddress = row.fieldId === 'address';
             const href = this.getRowHref(row.fieldId, row.def, row.data);
             const primary = document.createElement(href ? 'a' : 'span');
-            primary.className = 'sojern-card__contact-primary' + (href ? ' sojern-card__contact-link' : '');
+            primary.className = 'sojern-card__contact-primary'
+                + (href ? ' sojern-card__contact-link' : '')
+                + (isAddress ? ' sojern-card__contact-primary--address' : '');
 
             if (href) {
                 primary.href = href;

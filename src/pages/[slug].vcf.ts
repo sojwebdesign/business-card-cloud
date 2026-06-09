@@ -25,7 +25,7 @@ export const GET: APIRoute = async ({ params, locals, url }) => {
     return new Response(vcf, {
         status: 200,
         headers: {
-            'Content-Type': 'text/vcard; charset=utf-8',
+            'Content-Type': `text/vcard; charset=utf-8; name="${filename}"`,
             'Content-Disposition': `inline; filename="${filename}"`,
             'Cache-Control': 'no-cache, no-store, must-revalidate'
         }

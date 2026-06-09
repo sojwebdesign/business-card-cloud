@@ -38,22 +38,31 @@ async function shareContactFile(vcfUrl, fullName) {
     downloadBlob(blob, filename);
 }
 
-/** Contact page — open Add Contact without trapping the user on the vCard page. */
-async function saveToContacts(vcfUrl, fullName) {
-    const { file, filename, blob } = await fetchVCardFile(vcfUrl, fullName);
+function isMobileDevice() {
+    return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+        || (navigator.userAgent.includes('Mac') && navigator.maxTouchPoints > 1);
+}
 
-    if (navigator.canShare?.({ files: [file] })) {
-        try {
-            await navigator.share({ files: [file], title: fullName });
-            return;
-        } catch (err) {
-            if (err?.name === 'AbortError') return;
-        }
+/**
+ * Contact page — open the native Add to Contacts flow (not the share sheet).
+ * On iOS/Android, navigating to the vCard URL triggers the Contacts import UI.
+ */
+function openVCardImport(vcfUrl) {
+    const link = document.createElement('a');
+    link.href = vcfUrl;
+    link.rel = 'noopener';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+}
+
+async function saveToContacts(vcfUrl, fullName) {
+    if (isMobileDevice()) {
+        openVCardImport(vcfUrl);
+        return;
     }
 
-    const popup = window.open(vcfUrl, '_blank', 'noopener,noreferrer');
-    if (popup) return;
-
+    const { blob, filename } = await fetchVCardFile(vcfUrl, fullName);
     downloadBlob(blob, filename);
 }
 

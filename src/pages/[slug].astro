@@ -31,6 +31,7 @@ const fullName = card.cardData.fullName;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{fullName} — DigiCard</title>
     <meta name="robots" content="noindex, nofollow">
+    <meta name="format-detection" content="telephone=no, address=no">
     <link rel="icon" type="image/png" href="/business-card/Assets/DigiCard_Favicon_Light.png" media="(prefers-color-scheme: light)">
     <link rel="icon" type="image/png" href="/business-card/Assets/DigiCard_Favicon_Dark.png" media="(prefers-color-scheme: dark)">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -40,14 +41,14 @@ const fullName = card.cardData.fullName;
 </head>
 <body class="public-card-page contact-card-page">
     <main class="public-card-main">
-        <div id="cardPreviewMount" class="sojern-card-mount public-card-mount"></div>
-
-        <div class="public-card-actions">
+        <div class="public-card-actions public-card-actions--top">
             <button type="button" class="btn btn-primary public-card-save" id="saveContactBtn">
                 Save to Contacts
             </button>
-            <p class="helper-text public-card-hint" id="saveContactHint">Opens in a new tab — close it anytime to return here.</p>
+            <p class="helper-text public-card-hint" id="saveContactHint">Adds a new contact in your phone's Contacts app.</p>
         </div>
+
+        <div id="cardPreviewMount" class="sojern-card-mount public-card-mount"></div>
     </main>
 
     <script is:inline src="/business-card/card-fields.js"></script>
@@ -65,12 +66,12 @@ const fullName = card.cardData.fullName;
         btn?.addEventListener('click', async () => {
             btn.disabled = true;
             const original = btn.textContent;
-            btn.textContent = 'Opening…';
+            btn.textContent = 'Adding…';
             try {
                 await saveToContacts(vcfUrl, fullName);
             } catch (err) {
                 console.error(err);
-                if (hint) hint.textContent = 'Could not open contacts — try again or use the download link.';
+                if (hint) hint.textContent = 'Could not open Contacts — tap Save to Contacts again.';
             } finally {
                 btn.disabled = false;
                 btn.textContent = original;

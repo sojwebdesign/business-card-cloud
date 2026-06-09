@@ -305,6 +305,18 @@ function buildFieldEditor() {
     bindEditorPhotoEvents(photoSection);
 }
 
+function contactValueFieldHtml(def, data, attrs = {}) {
+    const placeholder = def.placeholder || '';
+    const classAttr = attrs.className ? ` class="${attrs.className}"` : '';
+    const idAttr = attrs.id ? ` id="${attrs.id}"` : '';
+
+    if (def.inputType === 'textarea') {
+        return `<textarea${classAttr}${idAttr} rows="3" placeholder="${escapeAttr(placeholder)}">${escapeHtml(data.value || '')}</textarea>`;
+    }
+
+    return `<input type="${def.inputType || 'text'}"${classAttr}${idAttr} value="${escapeAttr(data.value || '')}" placeholder="${escapeAttr(placeholder)}">`;
+}
+
 function createFieldControl(fieldId) {
     const def = CardFields.getDefinition(fieldId);
     const wrap = document.createElement('div');
@@ -314,7 +326,7 @@ function createFieldControl(fieldId) {
         const data = cardData[fieldId] || { value: '', label: def.defaultLabel };
         wrap.innerHTML = `
             <label for="field-${fieldId}">${def.label}${def.required ? ' <span class="required">*</span>' : ''}</label>
-            <input type="${def.inputType || 'text'}" id="field-${fieldId}" value="${escapeAttr(data.value)}" placeholder="${def.placeholder || ''}">
+            ${contactValueFieldHtml(def, data, { id: `field-${fieldId}` })}
             <label class="sub-label" for="field-${fieldId}-label">Label</label>
             <select id="field-${fieldId}-label">${def.labelOptions.map((o) => `<option value="${o}"${data.label === o ? ' selected' : ''}>${o}</option>`).join('')}</select>`;
 
@@ -361,10 +373,10 @@ function createOptionalFieldBlock(def) {
     } else if (def.type === 'contact') {
         const data = cardData[def.id];
         body.innerHTML = `
-            <input type="${def.inputType || 'text'}" class="field-optional-input" data-field="${def.id}" value="${escapeAttr(data.value)}" placeholder="${def.placeholder || ''}">
+            ${contactValueFieldHtml(def, data, { className: 'field-optional-input', id: `field-optional-${def.id}` })}
             <label class="sub-label">Label</label>
             <select data-field="${def.id}-label">${def.labelOptions.map((o) => `<option value="${o}"${data.label === o ? ' selected' : ''}>${o}</option>`).join('')}</select>`;
-        body.querySelector('input').addEventListener('input', (e) => {
+        body.querySelector('.field-optional-input').addEventListener('input', (e) => {
             cardData[def.id].value = e.target.value;
             renderCardPreview();
         });
