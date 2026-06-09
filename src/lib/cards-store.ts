@@ -1,5 +1,6 @@
 import type { PublishedCard, CardData } from './types';
 import { resolveUniqueSlug } from './slug';
+import { isReservedSlug } from './reserved-slugs';
 
 const KV_PREFIX = 'card:';
 
@@ -57,8 +58,12 @@ export async function saveCard(
 
     const slug = await resolveUniqueSlug(
         input.slug || cardData.fullName,
-        async (candidate) => !(await kv.get(kvKey(candidate)))
+        async (candidate) => !isReservedSlug(candidate) && !(await kv.get(kvKey(candidate)))
     );
+
+    if (isReservedSlug(slug)) {
+        throw new PublishError('This URL slug is reserved', 400);
+    }
 
     const record: PublishedCard = {
         slug,
@@ -86,8 +91,11 @@ export class PublishError extends Error {
 export function buildCardUrls(origin: string, slug: string, editKey: string) {
     const base = `${origin}/business-card`;
     return {
-        publicUrl: `${base}/c/${slug}`,
+        /** Owner page — card + QR, add to Home Screen */
+        shareUrl: `${base}/${slug}/share`,
+        /** Prospect page — card + Save to Contacts (QR target) */
+        contactUrl: `${base}/${slug}`,
         editUrl: `${base}/?edit=${slug}&key=${editKey}`,
-        vcfUrl: `${base}/c/${slug}.vcf`
+        vcfUrl: `${base}/${slug}.vcf`
     };
 }

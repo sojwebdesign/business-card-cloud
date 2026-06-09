@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
-import { getCardBySlug } from '../../../lib/cards-store';
+import { buildCardUrls, getCardBySlug } from '../../../lib/cards-store';
+import { getPublicOrigin } from '../../../lib/site-url';
 
 export const prerender = false;
 
@@ -19,13 +20,17 @@ export const GET: APIRoute = async ({ params, locals, url }) => {
         return json({ error: 'Invalid edit key' }, 403);
     }
 
+    const origin = getPublicOrigin(url.origin, locals);
+    const urls = buildCardUrls(origin, record.slug, record.editKey);
+
     return json({
         slug: record.slug,
         editKey: record.editKey,
         templateId: record.templateId,
         cardData: record.cardData,
         publishedAt: record.publishedAt,
-        updatedAt: record.updatedAt
+        updatedAt: record.updatedAt,
+        ...urls
     });
 };
 

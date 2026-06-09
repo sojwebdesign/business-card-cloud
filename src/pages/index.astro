@@ -49,7 +49,7 @@
                         <button class="btn btn-primary download-confirm" id="publishBtn">Publish Card</button>
                         <p class="download-menu-hint" id="publishHint">Save your card online to get a live link and QR code.</p>
                         <div class="download-divider"></div>
-                        <button class="btn btn-secondary download-confirm" id="copyPublicLinkBtn" disabled>Copy public link</button>
+                        <button class="btn btn-secondary download-confirm" id="copyPublicLinkBtn" disabled>Copy my card link</button>
                         <button class="btn btn-secondary download-confirm" id="saveQrBtn" disabled>Save QR to Photos</button>
                         <div class="download-divider"></div>
                         <button class="btn btn-secondary download-confirm" id="addToHomeBtn" disabled>Add to Home Screen</button>
@@ -224,23 +224,33 @@
         <div class="modal-card modal-card--wide">
             <button type="button" class="modal-close" id="closePublishModal" aria-label="Close">&times;</button>
             <h2 class="modal-title" id="publishModalTitle">Card published</h2>
-            <p class="modal-text">Your card is live. Share the public link or QR — prospects scan it to save your contact.</p>
+            <p class="modal-text">Your card is live. Add <strong>My card</strong> to your Home Screen to show your QR at events. Prospects scan the QR to open your contact page.</p>
 
             <div class="publish-url-block">
-                <label class="sub-label" for="publicUrlInput">Public link (share / QR)</label>
+                <label class="sub-label" for="shareUrlInput">My card — add to Home Screen</label>
                 <div class="publish-url-row">
-                    <input type="text" class="publish-url-input" id="publicUrlInput" readonly>
-                    <button type="button" class="btn btn-secondary" id="copyPublicUrlBtn">Copy</button>
+                    <input type="text" class="publish-url-input" id="shareUrlInput" readonly>
+                    <button type="button" class="btn btn-secondary" id="copyShareUrlBtn">Copy</button>
                 </div>
+                <p class="helper-text">Shows your card and QR code. This is the page you keep on your phone.</p>
             </div>
 
             <div class="publish-url-block">
-                <label class="sub-label" for="editUrlInput">Edit link (keep private)</label>
+                <label class="sub-label" for="contactUrlInput">Contact page — QR destination</label>
+                <div class="publish-url-row">
+                    <input type="text" class="publish-url-input" id="contactUrlInput" readonly>
+                    <button type="button" class="btn btn-secondary" id="copyContactUrlBtn">Copy</button>
+                </div>
+                <p class="helper-text">What prospects see when they scan your QR. No QR on this page — just Save to Contacts.</p>
+            </div>
+
+            <div class="publish-url-block">
+                <label class="sub-label" for="editUrlInput">Edit link — keep private</label>
                 <div class="publish-url-row">
                     <input type="text" class="publish-url-input" id="editUrlInput" readonly>
                     <button type="button" class="btn btn-secondary" id="copyEditUrlBtn">Copy</button>
                 </div>
-                <p class="helper-text">Bookmark this link to update your card later. The public link and QR stay the same.</p>
+                <p class="helper-text">Bookmark to update your card. Your links and QR stay the same.</p>
             </div>
 
             <div class="publish-modal-actions">
@@ -255,9 +265,9 @@
         <div class="modal-card">
             <button type="button" class="modal-close" id="closeHomeModal" aria-label="Close">&times;</button>
             <h2 class="modal-title">Add to Home Screen</h2>
-            <p class="modal-text">On your <strong>phone</strong>, open your published card in Safari, then:</p>
+            <p class="modal-text">On your <strong>phone</strong>, open your <strong>My card</strong> page in Safari, then:</p>
             <ol class="modal-steps">
-                <li>Open <a href="#" id="addToHomeCardLink" target="_blank" rel="noopener">your card link</a> on your iPhone</li>
+                <li>Open <a href="#" id="addToHomeCardLink" target="_blank" rel="noopener">your card page</a> on your iPhone</li>
                 <li>Tap the <strong>Share</strong> button (square with arrow)</li>
                 <li>Scroll down and tap <strong>Add to Home Screen</strong></li>
                 <li>Tap <strong>Add</strong> — your card opens like an app</li>

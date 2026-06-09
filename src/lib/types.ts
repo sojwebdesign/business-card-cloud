@@ -40,7 +40,8 @@ export interface PublishedCard {
 export interface PublishResponse {
     slug: string;
     editKey: string;
-    publicUrl: string;
+    shareUrl: string;
+    contactUrl: string;
     editUrl: string;
     vcfUrl: string;
     updated: boolean;

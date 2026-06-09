@@ -8,7 +8,8 @@ let currentTemplate = 'sojern';
 let publishState = {
     slug: null,
     editKey: null,
-    publicUrl: null,
+    shareUrl: null,
+    contactUrl: null,
     editUrl: null,
     published: false
 };
@@ -89,7 +90,8 @@ function bindPublishModal() {
         if (e.target === publishModal) publishModal.classList.add('hidden');
     });
     document.getElementById('publishDoneBtn')?.addEventListener('click', () => publishModal.classList.add('hidden'));
-    document.getElementById('copyPublicUrlBtn')?.addEventListener('click', () => copyText('publicUrlInput', 'Public link copied'));
+    document.getElementById('copyShareUrlBtn')?.addEventListener('click', () => copyText('shareUrlInput', 'My card link copied'));
+    document.getElementById('copyContactUrlBtn')?.addEventListener('click', () => copyText('contactUrlInput', 'Contact link copied'));
     document.getElementById('copyEditUrlBtn')?.addEventListener('click', () => copyText('editUrlInput', 'Edit link copied'));
     document.getElementById('publishSaveQrBtn')?.addEventListener('click', saveQrToPhotos);
 }
@@ -421,7 +423,7 @@ function proceedToEditor() {
 function resetApp() {
     cardData = CardFields.createDefaultCardData();
     currentTemplate = 'sojern';
-    publishState = { slug: null, editKey: null, publicUrl: null, editUrl: null, published: false };
+    publishState = { slug: null, editKey: null, shareUrl: null, contactUrl: null, editUrl: null, published: false };
     updateShareMenuState();
     basicsForm.reset();
     photoPreview.classList.add('hidden');
@@ -438,9 +440,11 @@ function renderCardPreview() {
     CardTemplates.render(cardPreviewMount, currentTemplate, cardData);
 }
 
-function getCardShareUrl() {
+/** QR encodes the contact page — what prospects see when they scan. */
+function getContactUrl() {
+    if (publishState.contactUrl) return publishState.contactUrl;
     const slug = publishState.slug || slugify(cardData.fullName || 'preview');
-    return `${window.location.origin}/business-card/c/${slug}`;
+    return `${window.location.origin}/business-card/${slug}`;
 }
 
 function generateQR() {
@@ -449,7 +453,7 @@ function generateQR() {
         console.warn('QRCode library not loaded');
         return;
     }
-    const url = getCardShareUrl();
+    const url = getContactUrl();
     QRCode.toCanvas(
         qrCanvas,
         url,
@@ -470,17 +474,17 @@ function generateQR() {
 function bindShareActions() {
     publishBtn?.addEventListener('click', publishCard);
     copyPublicLinkBtn?.addEventListener('click', () => {
-        if (!publishState.publicUrl) return;
-        copyToClipboard(publishState.publicUrl, 'Public link copied');
+        if (!publishState.shareUrl) return;
+        copyToClipboard(publishState.shareUrl, 'My card link copied');
         downloadDropdown.classList.remove('open');
     });
     saveQrBtn?.addEventListener('click', saveQrToPhotos);
     addToHomeBtn?.addEventListener('click', () => {
-        if (!publishState.publicUrl) return;
+        if (!publishState.shareUrl) return;
         const link = document.getElementById('addToHomeCardLink');
         if (link) {
-            link.href = publishState.publicUrl;
-            link.textContent = 'your card link';
+            link.href = publishState.shareUrl;
+            link.textContent = 'your card page';
         }
         addToHomeModal?.classList.remove('hidden');
         downloadDropdown.classList.remove('open');
@@ -513,7 +517,8 @@ async function publishCard() {
         publishState = {
             slug: result.slug,
             editKey: result.editKey,
-            publicUrl: result.publicUrl,
+            shareUrl: result.shareUrl,
+            contactUrl: result.contactUrl,
             editUrl: result.editUrl,
             published: true
         };
@@ -535,7 +540,8 @@ async function publishCard() {
 
 function showPublishModal(updated) {
     document.getElementById('publishModalTitle').textContent = updated ? 'Card updated' : 'Card published';
-    document.getElementById('publicUrlInput').value = publishState.publicUrl || '';
+    document.getElementById('shareUrlInput').value = publishState.shareUrl || '';
+    document.getElementById('contactUrlInput').value = publishState.contactUrl || '';
     document.getElementById('editUrlInput').value = publishState.editUrl || '';
     publishModal?.classList.remove('hidden');
 }
@@ -547,12 +553,12 @@ function updateShareMenuState() {
     }
     if (publishHint) {
         publishHint.textContent = isPublished
-            ? 'Your card is live. Update anytime — the public link stays the same.'
-            : 'Save your card online to get a live link and QR code.';
+            ? 'Your card is live. Update anytime — your links and QR stay the same.'
+            : 'Save your card online to get your card link, contact page, and QR code.';
     }
     if (qrHint) {
         qrHint.textContent = isPublished
-            ? 'QR links to your live card'
+            ? 'QR links to your contact page for prospects'
             : 'Publish your card to activate this QR code';
     }
     [copyPublicLinkBtn, saveQrBtn, addToHomeBtn].forEach((btn) => {
@@ -578,8 +584,9 @@ async function loadEditFromUrl() {
         publishState = {
             slug: result.slug,
             editKey: result.editKey,
-            publicUrl: `${window.location.origin}/business-card/c/${result.slug}`,
-            editUrl: `${window.location.origin}/business-card/?edit=${result.slug}&key=${result.editKey}`,
+            shareUrl: result.shareUrl,
+            contactUrl: result.contactUrl,
+            editUrl: result.editUrl,
             published: true
         };
 

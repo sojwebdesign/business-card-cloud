@@ -32,11 +32,18 @@ npm run dev
 
 ### URLs after publish
 
+On production these resolve to `https://sojern.design/business-card/...` (not the long cosmic staging URL).
+
 | URL | Purpose |
 |-----|---------|
-| `/business-card/c/{slug}` | Public card (QR target, prospects save contact) |
-| `/business-card/c/{slug}.vcf` | Direct vCard download |
-| `/business-card/?edit={slug}&key={token}` | Edit link (bookmark privately) |
+| `/business-card/{slug}/share` | **My card** — owner page with QR; add to Home Screen |
+| `/business-card/{slug}` | **Contact page** — QR destination; Save to Contacts |
+| `/business-card/{slug}.vcf` | vCard with name, photo, and contact fields |
+| `/business-card/?edit={slug}&key={token}` | **Edit link** — bookmark privately |
+
+Set `PUBLIC_SITE_ORIGIN` in `wrangler.json` (or Webflow Cloud env) so copied links and QR codes use your production domain.
+
+Legacy `/c/` and `/s/` paths redirect to the shorter URLs automatically.
 
 ## Deploy to Webflow Cloud
 

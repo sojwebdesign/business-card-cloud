@@ -16,5 +16,8 @@
       "binding": "CARDS",
       "id": "00000000000000000000000000000000"
     }
-  ]
+  ],
+  "vars": {
+    "PUBLIC_SITE_ORIGIN": "https://sojern.design"
+  }
 }

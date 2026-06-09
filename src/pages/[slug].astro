@@ -1,0 +1,79 @@
+---
+import { getCardBySlug } from '../lib/cards-store';
+import { isReservedSlug } from '../lib/reserved-slugs';
+
+export const prerender = false;
+
+const { slug } = Astro.params;
+if (!slug || isReservedSlug(slug)) {
+    return Astro.redirect('/business-card/');
+}
+
+let card = null;
+try {
+    card = await getCardBySlug(Astro.locals, slug);
+} catch {
+    card = null;
+}
+
+if (!card) {
+    return new Response('Card not found', { status: 404 });
+}
+
+const vcfUrl = `/business-card/${slug}.vcf`;
+const templateId = card.templateId;
+const fullName = card.cardData.fullName;
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{fullName} — Sojern</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/business-card/styles.css">
+</head>
+<body class="public-card-page contact-card-page">
+    <main class="public-card-main">
+        <div id="cardPreviewMount" class="sojern-card-mount public-card-mount"></div>
+
+        <div class="public-card-actions">
+            <button type="button" class="btn btn-primary public-card-save" id="saveContactBtn">
+                Save to Contacts
+            </button>
+            <p class="helper-text public-card-hint" id="saveContactHint">Adds name, photo, and contact details to your phone.</p>
+        </div>
+    </main>
+
+    <script is:inline src="/business-card/card-fields.js"></script>
+    <script is:inline src="/business-card/card-icons.js"></script>
+    <script is:inline src="/business-card/card-templates.js"></script>
+    <script is:inline src="/business-card/contact-page.js"></script>
+    <script is:inline define:vars={{ cardData: card.cardData, templateId, vcfUrl, fullName }}>
+        const mount = document.getElementById('cardPreviewMount');
+        if (mount && window.CardTemplates) {
+            window.CardTemplates.render(mount, templateId, cardData);
+        }
+
+        const btn = document.getElementById('saveContactBtn');
+        const hint = document.getElementById('saveContactHint');
+        btn?.addEventListener('click', async () => {
+            btn.disabled = true;
+            const original = btn.textContent;
+            btn.textContent = 'Opening…';
+            try {
+                await saveToContacts(vcfUrl, fullName);
+            } catch (err) {
+                console.error(err);
+                if (hint) hint.textContent = 'Could not open contacts — try again or use the download link.';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = original;
+            }
+        });
+    </script>
+</body>
+</html>

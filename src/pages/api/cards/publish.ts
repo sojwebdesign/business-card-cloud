@@ -4,6 +4,7 @@ import {
     PublishError,
     saveCard
 } from '../../../lib/cards-store';
+import { getPublicOrigin } from '../../../lib/site-url';
 import type { CardData } from '../../../lib/types';
 
 export const prerender = false;
@@ -39,7 +40,8 @@ export const POST: APIRoute = async ({ request, locals, url }) => {
             editKey
         });
 
-        const urls = buildCardUrls(url.origin, record.slug, record.editKey);
+        const origin = getPublicOrigin(url.origin, locals);
+        const urls = buildCardUrls(origin, record.slug, record.editKey);
 
         return json({
             slug: record.slug,
