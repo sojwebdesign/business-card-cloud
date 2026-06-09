@@ -881,8 +881,10 @@ function downloadVcf() {
 
 function buildVCard() {
     const lines = ['BEGIN:VCARD', 'VERSION:3.0', `FN:${cardData.fullName}`, `TITLE:${cardData.jobTitle}`, `ORG:${CardFields.COMPANY_NAME}`];
-    if (cardData.email?.value) lines.push(`EMAIL;TYPE=${cardData.email.label}:${cardData.email.value}`);
-    if (cardData.enabled.phone && cardData.phone?.value) lines.push(`TEL;TYPE=${cardData.phone.label}:${cardData.phone.value}`);
+    const contactType = (label) => (CardFields.showContactLabel(label) ? `;TYPE=${label}` : '');
+    if (cardData.email?.value) lines.push(`EMAIL${contactType(cardData.email.label)}:${cardData.email.value}`);
+    if (cardData.enabled.phone && cardData.phone?.value) lines.push(`TEL${contactType(cardData.phone.label)}:${cardData.phone.value}`);
+    if (cardData.enabled.address && cardData.address?.value) lines.push(`ADR${contactType(cardData.address.label)}:;;${cardData.address.value};;;;`);
     if (cardData.enabled.companyUrl && cardData.companyUrl?.value) {
         const url = cardData.companyUrl.value.startsWith('http') ? cardData.companyUrl.value : `https://${cardData.companyUrl.value}`;
         lines.push(`URL:${url}`);

@@ -5,6 +5,11 @@
 window.CardFields = {
     COMPANY_NAME: 'Sojern',
     COMPANY_URL_DEFAULT: 'www.sojern.com',
+    NONE_LABEL: 'None',
+
+    showContactLabel(label) {
+        return Boolean(label && label !== this.NONE_LABEL);
+    },
 
     /** @type {Record<string, import('./types').FieldDefinition>} */
     definitions: {
@@ -37,7 +42,7 @@ window.CardFields = {
             section: 'required',
             placeholder: 'jane@sojern.com',
             inputType: 'email',
-            labelOptions: ['Work', 'Personal'],
+            labelOptions: ['Work', 'Personal', 'None'],
             defaultLabel: 'Work',
             icon: 'email',
             vcard: 'EMAIL'
@@ -90,7 +95,7 @@ window.CardFields = {
             section: 'optional',
             placeholder: '+1 (555) 123-4567',
             inputType: 'tel',
-            labelOptions: ['Mobile', 'Work', 'Home', 'Main', 'Personal'],
+            labelOptions: ['Mobile', 'Work', 'Home', 'Main', 'Personal', 'None'],
             defaultLabel: 'Mobile',
             icon: 'phone',
             vcard: 'TEL'
@@ -116,7 +121,7 @@ window.CardFields = {
             section: 'optional',
             placeholder: '123 Main St\nCity, ST 12345',
             inputType: 'textarea',
-            labelOptions: ['Work', 'Home'],
+            labelOptions: ['Work', 'Home', 'None'],
             defaultLabel: 'Work',
             icon: 'address',
             vcard: 'ADR'

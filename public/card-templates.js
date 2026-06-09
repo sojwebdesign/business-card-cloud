@@ -201,7 +201,7 @@ window.CardTemplates = {
 
             textWrap.appendChild(primary);
 
-            if (row.def.type === 'contact' && row.data.label) {
+            if (row.def.type === 'contact' && fields.showContactLabel(row.data.label)) {
                 const secondary = document.createElement('span');
                 secondary.className = 'sojern-card__contact-secondary';
                 secondary.textContent = row.data.label;

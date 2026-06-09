@@ -1,6 +1,11 @@
 import type { CardData } from './types';
 
 const COMPANY_NAME = 'Sojern';
+const NONE_LABEL = 'None';
+
+function contactTypeParam(label: string | undefined): string {
+    return label && label !== NONE_LABEL ? `;TYPE=${label}` : '';
+}
 
 export interface VCardOptions {
     slug?: string;
@@ -79,13 +84,13 @@ export function buildVCard(cardData: CardData, options: VCardOptions = {}): stri
     if (embedded) lines.push(embedded);
 
     if (cardData.email?.value) {
-        lines.push(`EMAIL;TYPE=${cardData.email.label}:${escapeVCard(cardData.email.value)}`);
+        lines.push(`EMAIL${contactTypeParam(cardData.email.label)}:${escapeVCard(cardData.email.value)}`);
     }
     if (cardData.enabled?.phone && cardData.phone?.value) {
-        lines.push(`TEL;TYPE=${cardData.phone.label}:${escapeVCard(cardData.phone.value)}`);
+        lines.push(`TEL${contactTypeParam(cardData.phone.label)}:${escapeVCard(cardData.phone.value)}`);
     }
     if (cardData.enabled?.address && cardData.address?.value) {
-        lines.push(`ADR;TYPE=${cardData.address.label}:;;${escapeVCard(cardData.address.value)};;;;`);
+        lines.push(`ADR${contactTypeParam(cardData.address.label)}:;;${escapeVCard(cardData.address.value)};;;;`);
     }
     if (cardData.enabled?.companyUrl && cardData.companyUrl?.value) {
         lines.push(`URL:${normalizeUrl(cardData.companyUrl.value)}`);
