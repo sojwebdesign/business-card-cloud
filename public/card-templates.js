@@ -23,6 +23,51 @@ window.CardTemplates = {
         return Object.values(this.registry);
     },
 
+    renderThumb(container, templateId) {
+        const template = this.getTemplate(templateId);
+        container.className = 'template-thumb-card';
+        container.innerHTML = `
+            <div class="template-thumb-card__header"></div>
+            <div class="template-thumb-card__content">
+                <div class="template-thumb-card__avatar" aria-hidden="true">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <circle cx="12" cy="8" r="4"/>
+                        <path d="M4 20c0-4 4-6 8-6s8 2 8 6"/>
+                    </svg>
+                </div>
+                <div class="template-thumb-card__identity">
+                    <span class="template-thumb-card__line template-thumb-card__line--lg"></span>
+                    <span class="template-thumb-card__line template-thumb-card__line--md"></span>
+                    <span class="template-thumb-card__line template-thumb-card__line--sm"></span>
+                </div>
+                <div class="template-thumb-card__contacts">
+                    <div class="template-thumb-card__contact">
+                        <span class="template-thumb-card__icon"></span>
+                        <span class="template-thumb-card__line template-thumb-card__line--contact"></span>
+                    </div>
+                    <div class="template-thumb-card__contact">
+                        <span class="template-thumb-card__icon"></span>
+                        <span class="template-thumb-card__line template-thumb-card__line--contact"></span>
+                    </div>
+                </div>
+            </div>`;
+
+        const header = container.querySelector('.template-thumb-card__header');
+        const tryHeader = (src, next) => {
+            const probe = new Image();
+            probe.onload = () => { header.style.backgroundImage = `url('${src}')`; };
+            probe.onerror = () => {
+                if (next) tryHeader(next, null);
+                else {
+                    header.style.backgroundImage = 'none';
+                    header.style.background = template.headerFallback;
+                }
+            };
+            probe.src = src;
+        };
+        tryHeader(template.headerImage, template.headerPlaceholder);
+    },
+
     getRowHref(fieldId, def, data) {
         if (!data?.value) return null;
 

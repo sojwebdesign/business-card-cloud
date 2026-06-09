@@ -216,9 +216,10 @@ function renderTemplateGrid() {
         btn.dataset.template = tpl.id;
         btn.innerHTML = `
             <div class="effect-option-preview">
-                <div class="template-thumb ${tpl.thumbClass}"></div>
+                <div class="template-thumb"></div>
             </div>
             <span class="effect-option-label">${tpl.name}</span>`;
+        CardTemplates.renderThumb(btn.querySelector('.template-thumb'), tpl.id);
         btn.addEventListener('click', () => {
             templateGrid.querySelectorAll('.template-option').forEach((el) => el.classList.remove('selected'));
             btn.classList.add('selected');
