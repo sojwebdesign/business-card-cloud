@@ -42,6 +42,11 @@ const copyPublicLinkBtn = document.getElementById('copyPublicLinkBtn');
 const saveQrBtn = document.getElementById('saveQrBtn');
 const addToHomeBtn = document.getElementById('addToHomeBtn');
 
+const CARD_PUBLIC_ORIGIN = (
+    document.querySelector('meta[name="card-public-origin"]')?.content
+    || 'https://sojern.design'
+).replace(/\/$/, '');
+
 init();
 
 function init() {
@@ -440,11 +445,43 @@ function renderCardPreview() {
     CardTemplates.render(cardPreviewMount, currentTemplate, cardData);
 }
 
+function isStagingOrigin(origin) {
+    try {
+        const host = new URL(origin).hostname;
+        return host.includes('cosmic.webflow.services')
+            || host.includes('.webflow.io')
+            || host.endsWith('.workers.dev');
+    } catch {
+        return false;
+    }
+}
+
+/** Ensure card links always use the production Design Hub domain. */
+function normalizePublishedUrls(result) {
+    const base = `${CARD_PUBLIC_ORIGIN}/business-card`;
+    const needsFix = !result.shareUrl
+        || isStagingOrigin(result.shareUrl)
+        || result.shareUrl.includes('cosmic.webflow');
+    if (!needsFix) {
+        return {
+            shareUrl: result.shareUrl,
+            contactUrl: result.contactUrl,
+            editUrl: result.editUrl
+        };
+    }
+    return {
+        shareUrl: `${base}/${result.slug}/share`,
+        contactUrl: `${base}/${result.slug}`,
+        editUrl: `${base}/?edit=${result.slug}&key=${result.editKey}`
+    };
+}
+
 /** QR encodes the contact page — what prospects see when they scan. */
 function getContactUrl() {
     if (publishState.contactUrl) return publishState.contactUrl;
     const slug = publishState.slug || slugify(cardData.fullName || 'preview');
-    return `${window.location.origin}/business-card/${slug}`;
+    const origin = isStagingOrigin(window.location.origin) ? CARD_PUBLIC_ORIGIN : window.location.origin;
+    return `${origin}/business-card/${slug}`;
 }
 
 function generateQR() {
@@ -514,12 +551,13 @@ async function publishCard() {
             throw new Error(result.error || 'Publish failed');
         }
 
+        const urls = normalizePublishedUrls(result);
         publishState = {
             slug: result.slug,
             editKey: result.editKey,
-            shareUrl: result.shareUrl,
-            contactUrl: result.contactUrl,
-            editUrl: result.editUrl,
+            shareUrl: urls.shareUrl,
+            contactUrl: urls.contactUrl,
+            editUrl: urls.editUrl,
             published: true
         };
 
@@ -581,12 +619,13 @@ async function loadEditFromUrl() {
 
         cardData = result.cardData;
         currentTemplate = result.templateId || 'sojern';
+        const urls = normalizePublishedUrls(result);
         publishState = {
             slug: result.slug,
             editKey: result.editKey,
-            shareUrl: result.shareUrl,
-            contactUrl: result.contactUrl,
-            editUrl: result.editUrl,
+            shareUrl: urls.shareUrl,
+            contactUrl: urls.contactUrl,
+            editUrl: urls.editUrl,
             published: true
         };
 
