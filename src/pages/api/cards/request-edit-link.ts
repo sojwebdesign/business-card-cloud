@@ -30,10 +30,7 @@ export const POST: APIRoute = async ({ request, locals, url }) => {
         }
 
         if (cards.length) {
-            const env = locals.runtime?.env as {
-                RESEND_API_KEY?: string;
-                EDIT_LINK_EMAIL_FROM?: string;
-            };
+            const env = locals.runtime?.env as import('../../../lib/email-env').EmailEnv;
             const origin = getPublicOrigin(url.origin, locals);
             const payload = [];
 

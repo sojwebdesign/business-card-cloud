@@ -80,12 +80,29 @@ curl -X POST https://sojern.design/business-card/api/admin/cards/delete \
   -d '{"adminKey":"YOUR_SECRET","slug":"example-slug"}'
 ```
 
-Configure email delivery in Webflow Cloud (or `wrangler.json` vars for local preview):
+Configure email delivery in Webflow Cloud (or `wrangler.json` vars for local preview).
+
+**Recommended for Sojern Workspace — Gmail API** (sends from your `@sojern.com` account):
 
 | Variable | Purpose |
 |----------|---------|
-| `RESEND_API_KEY` | Resend API key for magic-link and delete-confirmation emails |
+| `GMAIL_CLIENT_ID` | Google OAuth client ID |
+| `GMAIL_CLIENT_SECRET` | Google OAuth client secret |
+| `GMAIL_REFRESH_TOKEN` | One-time OAuth refresh token (`npm run gmail:setup`) |
+| `GMAIL_FROM_EMAIL` | Your Workspace address, e.g. `you@sojern.com` |
+| `GMAIL_FROM_NAME` | Display name, e.g. `Sojern DigiCard` |
+
+Step-by-step setup: [docs/GMAIL_SETUP.md](docs/GMAIL_SETUP.md)
+
+**Fallback — Resend** (used only if Gmail vars are not set):
+
+| Variable | Purpose |
+|----------|---------|
+| `RESEND_API_KEY` | Resend API key |
 | `EDIT_LINK_EMAIL_FROM` | Sender, e.g. `Sojern DigiCard <digicard@sojern.design>` |
+
+| Variable | Purpose |
+|----------|---------|
 | `DIGICARD_ADMIN_KEY` | Secret for admin list/delete APIs and `/business-card/admin` |
 
 Legacy `/c/` and `/s/` paths redirect to the shorter URLs automatically.

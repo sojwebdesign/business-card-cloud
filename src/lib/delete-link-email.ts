@@ -1,3 +1,6 @@
+import type { EmailEnv } from './email-env';
+import { sendEmail } from './email';
+
 interface DeleteLinkEmailCard {
     fullName: string;
     token: string;
@@ -27,37 +30,16 @@ function buildEmailHtml(origin: string, cards: DeleteLinkEmailCard[]): string {
 }
 
 export async function sendDeleteLinkEmail(
-    env: { RESEND_API_KEY?: string; EDIT_LINK_EMAIL_FROM?: string },
+    env: EmailEnv,
     origin: string,
     toEmail: string,
     cards: DeleteLinkEmailCard[]
 ): Promise<void> {
-    const apiKey = env.RESEND_API_KEY;
-    if (!apiKey) {
-        console.error('RESEND_API_KEY is not configured — cannot send delete confirmation email');
-        throw new Error('Email service is not configured');
-    }
-
-    const from = env.EDIT_LINK_EMAIL_FROM || 'Sojern DigiCard <digicard@sojern.design>';
-    const response = await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-            Authorization: `Bearer ${apiKey}`,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            from,
-            to: [toEmail],
-            subject: cards.length === 1
-                ? 'Confirm Sojern DigiCard deletion'
-                : 'Confirm Sojern DigiCard deletions',
-            html: buildEmailHtml(origin, cards)
-        })
+    await sendEmail(env, {
+        to: toEmail,
+        subject: cards.length === 1
+            ? 'Confirm Sojern DigiCard deletion'
+            : 'Confirm Sojern DigiCard deletions',
+        html: buildEmailHtml(origin, cards)
     });
-
-    if (!response.ok) {
-        const detail = await response.text();
-        console.error('Resend delete email failed', response.status, detail);
-        throw new Error('Could not send delete confirmation email');
-    }
 }

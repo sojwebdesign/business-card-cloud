@@ -8,7 +8,8 @@
     "preview": "astro build && wrangler dev",
     "deploy": "webflow cloud deploy",
     "astro": "astro",
-    "cf-typegen": "wrangler types"
+    "cf-typegen": "wrangler types",
+    "gmail:setup": "node scripts/gmail-oauth-setup.mjs"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^12.6.6",

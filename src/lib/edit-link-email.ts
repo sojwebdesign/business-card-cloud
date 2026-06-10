@@ -1,3 +1,6 @@
+import type { EmailEnv } from './email-env';
+import { sendEmail } from './email';
+
 interface EditLinkEmailCard {
     fullName: string;
     token: string;
@@ -27,37 +30,16 @@ function buildEmailHtml(origin: string, cards: EditLinkEmailCard[]): string {
 }
 
 export async function sendEditLinkEmail(
-    env: { RESEND_API_KEY?: string; EDIT_LINK_EMAIL_FROM?: string },
+    env: EmailEnv,
     origin: string,
     toEmail: string,
     cards: EditLinkEmailCard[]
 ): Promise<void> {
-    const apiKey = env.RESEND_API_KEY;
-    if (!apiKey) {
-        console.error('RESEND_API_KEY is not configured — cannot send edit link email');
-        throw new Error('Email service is not configured');
-    }
-
-    const from = env.EDIT_LINK_EMAIL_FROM || 'Sojern DigiCard <digicard@sojern.design>';
-    const response = await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-            Authorization: `Bearer ${apiKey}`,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            from,
-            to: [toEmail],
-            subject: cards.length === 1
-                ? 'Your Sojern DigiCard edit link'
-                : 'Your Sojern DigiCard edit links',
-            html: buildEmailHtml(origin, cards)
-        })
+    await sendEmail(env, {
+        to: toEmail,
+        subject: cards.length === 1
+            ? 'Your Sojern DigiCard edit link'
+            : 'Your Sojern DigiCard edit links',
+        html: buildEmailHtml(origin, cards)
     });
-
-    if (!response.ok) {
-        const detail = await response.text();
-        console.error('Resend email failed', response.status, detail);
-        throw new Error('Could not send edit link email');
-    }
 }
