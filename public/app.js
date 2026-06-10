@@ -97,10 +97,18 @@ function bindDownloadMenu() {
 }
 
 function bindModal() {
-    closeHomeModal?.addEventListener('click', () => addToHomeModal.classList.add('hidden'));
+    closeHomeModal?.addEventListener('click', closeHomeScreenGuideModal);
     addToHomeModal?.addEventListener('click', (e) => {
-        if (e.target === addToHomeModal) addToHomeModal.classList.add('hidden');
+        if (e.target === addToHomeModal) closeHomeScreenGuideModal();
     });
+    document.getElementById('homeScreenGuideLink')?.addEventListener('click', () => {
+        openHomeScreenGuideModal(publishState.shareUrl || '');
+    });
+}
+
+function closeHomeScreenGuideModal() {
+    addToHomeModal?.classList.add('hidden');
+    addToHomeModal?.classList.remove('modal-overlay--stacked');
 }
 
 function bindPublishModal() {
@@ -656,9 +664,10 @@ function showPublishModal(updated) {
     publishModal?.classList.remove('hidden');
 }
 
-function openHomeScreenGuideModal(shareUrl) {
+function openHomeScreenGuideModal(shareUrl, options = {}) {
     HomeScreenGuide.mount(document.getElementById('homeScreenGuideModalMount'), { shareUrl });
     addToHomeModal?.classList.remove('hidden');
+    addToHomeModal?.classList.toggle('modal-overlay--stacked', Boolean(options.stack));
 }
 
 function refreshHomeScreenGuides(shareUrl) {
@@ -742,11 +751,23 @@ async function copyToClipboard(text, successMessage) {
     }
 }
 
+function resetRecoverModal() {
+    const recoverForm = document.getElementById('recoverForm');
+    const resultsEl = document.getElementById('recoverResults');
+
+    recoverForm?.reset();
+    if (resultsEl) {
+        resultsEl.classList.add('hidden');
+        resultsEl.innerHTML = '';
+    }
+}
+
 function bindRecoverModal() {
     const recoverModal = document.getElementById('recoverModal');
     const recoverForm = document.getElementById('recoverForm');
 
     document.getElementById('findCardBtn')?.addEventListener('click', () => {
+        resetRecoverModal();
         recoverModal?.classList.remove('hidden');
         const email = document.getElementById('email')?.value?.trim();
         if (email) document.getElementById('recoverEmail').value = email;
@@ -754,11 +775,14 @@ function bindRecoverModal() {
 
     document.getElementById('closeRecoverModal')?.addEventListener('click', () => {
         recoverModal?.classList.add('hidden');
-        document.getElementById('homeScreenGuideRecoverMount')?.classList.add('hidden');
+        resetRecoverModal();
     });
 
     recoverModal?.addEventListener('click', (e) => {
-        if (e.target === recoverModal) recoverModal.classList.add('hidden');
+        if (e.target === recoverModal) {
+            recoverModal.classList.add('hidden');
+            resetRecoverModal();
+        }
     });
 
     recoverForm?.addEventListener('submit', async (e) => {
@@ -780,18 +804,6 @@ function bindRecoverModal() {
 
             resultsEl.classList.remove('hidden');
             resultsEl.innerHTML = '';
-
-            const recoverGuideMount = document.getElementById('homeScreenGuideRecoverMount');
-            if (recoverGuideMount && result.cards.length) {
-                recoverGuideMount.classList.remove('hidden');
-                HomeScreenGuide.mount(recoverGuideMount, {
-                    shareUrl: result.cards[0].shareUrl,
-                    variant: 'compact'
-                });
-            } else if (recoverGuideMount) {
-                recoverGuideMount.classList.add('hidden');
-                recoverGuideMount.innerHTML = '';
-            }
 
             result.cards.forEach((card) => {
                 const item = document.createElement('div');
@@ -833,16 +845,20 @@ function bindRecoverModal() {
                     copyToClipboard(card.shareUrl, 'My card link copied');
                 });
                 item.querySelector('[data-action="home-screen"]').addEventListener('click', () => {
-                    openHomeScreenGuideModal(card.shareUrl);
+                    openHomeScreenGuideModal(card.shareUrl, { stack: true });
                 });
                 item.querySelector('[data-action="delete"]').addEventListener('click', async () => {
                     if (!confirm(`Delete ${card.fullName}'s card? This cannot be undone.`)) return;
-                    await deleteCardBySlug(card.slug, card.editUrl);
-                    item.remove();
-                    if (!resultsEl.children.length) {
-                        resultsEl.innerHTML = '<p class="helper-text">No cards found.</p>';
+                    try {
+                        await deleteCardBySlug(card.slug, card.editKey);
+                        item.remove();
+                        if (!resultsEl.children.length) {
+                            resultsEl.innerHTML = '<p class="helper-text">No cards found.</p>';
+                        }
+                        showToast('Card deleted', 'success');
+                    } catch (error) {
+                        showToast(error.message || 'Could not delete card', 'error');
                     }
-                    showToast('Card deleted', 'success');
                 });
 
                 resultsEl.appendChild(item);
@@ -867,12 +883,13 @@ function formatRecoverTimestamp(iso) {
     return date.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
 }
 
-async function deleteCardBySlug(slug, editUrl) {
-    const key = new URL(editUrl, window.location.origin).searchParams.get('key');
-    const response = await fetch(`/business-card/api/cards/${encodeURIComponent(slug)}?key=${encodeURIComponent(key)}`, {
+async function deleteCardBySlug(slug, editKey) {
+    if (!slug || !editKey) throw new Error('Missing card credentials');
+
+    const response = await fetch(`/business-card/api/cards/${encodeURIComponent(slug)}?key=${encodeURIComponent(editKey)}`, {
         method: 'DELETE'
     });
-    const result = await response.json();
+    const result = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(result.error || 'Delete failed');
 }
 
@@ -881,7 +898,7 @@ async function deletePublishedCard() {
     if (!confirm('Delete this card permanently? All links and QR codes will stop working.')) return;
 
     try {
-        await deleteCardBySlug(publishState.slug, publishState.editUrl);
+        await deleteCardBySlug(publishState.slug, publishState.editKey);
         showToast('Card deleted', 'success');
         resetApp();
     } catch (error) {

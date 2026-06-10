@@ -2794,6 +2794,10 @@ a.sojern-card__contact-link:focus-visible {
     padding: var(--space-4);
 }
 
+.modal-overlay--stacked {
+    z-index: 3000;
+}
+
 .modal-card {
     background: var(--bg-white);
     border-radius: var(--radius-lg);
@@ -2806,6 +2810,33 @@ a.sojern-card__contact-link:focus-visible {
 
 .modal-card--wide {
     max-width: 520px;
+}
+
+.modal-card--scroll {
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.home-guide-link-wrap {
+    margin: var(--space-3) 0 0;
+}
+
+.home-guide-link {
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: var(--font-sans);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--brand-primary);
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.home-guide-link:hover,
+.home-guide-link:focus-visible {
+    color: var(--brand-primary-dark, #c44f32);
 }
 
 .download-menu-hint {
@@ -3010,9 +3041,10 @@ a.sojern-card__contact-link:focus-visible {
 .home-screen-guide__intro,
 .home-screen-guide__update-note {
     font-size: 0.875rem;
+    font-family: var(--font-sans);
     color: var(--text-secondary);
     line-height: 1.55;
-    margin: 0 0 var(--space-3);
+    margin: var(--space-4) 0 0;
 }
 
 .home-screen-guide__link-row {
@@ -3066,9 +3098,11 @@ a.sojern-card__contact-link:focus-visible {
 .home-screen-guide__steps {
     margin: 0;
     padding-left: var(--space-5);
+    font-family: var(--font-sans);
     color: var(--text-secondary);
     font-size: 0.875rem;
     line-height: 1.6;
+    list-style-position: outside;
 }
 
 .home-screen-guide__steps li {

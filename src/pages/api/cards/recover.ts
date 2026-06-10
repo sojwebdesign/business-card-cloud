@@ -23,6 +23,7 @@ export const POST: APIRoute = async ({ request, locals, url }) => {
         return json({
             cards: cards.map((card) => ({
                 slug: card.slug,
+                editKey: card.editKey,
                 fullName: card.cardData.fullName,
                 jobTitle: card.cardData.jobTitle,
                 updatedAt: card.updatedAt,
