@@ -62,6 +62,11 @@ const manifestUrl = `/business-card/${slug}/manifest.webmanifest`;
                 Share Contact
             </button>
             <p class="helper-text share-contact-hint">Send via AirDrop or Messages to a nearby iPhone</p>
+
+            <details class="share-home-screen-guide" open>
+                <summary>Save to your phone's Home Screen</summary>
+                <div id="homeScreenGuideShareMount"></div>
+            </details>
         </div>
 
         <div id="cardPreviewMount" class="sojern-card-mount public-card-mount"></div>
@@ -72,7 +77,12 @@ const manifestUrl = `/business-card/${slug}/manifest.webmanifest`;
     <script is:inline src="/business-card/card-icons.js"></script>
     <script is:inline src="/business-card/card-templates.js"></script>
     <script is:inline src="/business-card/contact-page.js"></script>
-    <script is:inline define:vars={{ cardData: card.cardData, templateId, contactUrl, vcfUrl, fullName }}>
+    <script is:inline src="/business-card/home-screen-guide.js"></script>
+    <script is:inline define:vars={{ cardData: card.cardData, templateId, contactUrl, vcfUrl, fullName, shareUrl: urls.shareUrl }}>
+        HomeScreenGuide.mount(document.getElementById('homeScreenGuideShareMount'), {
+            shareUrl,
+            variant: 'full'
+        });
         const mount = document.getElementById('cardPreviewMount');
         if (mount && window.CardTemplates) {
             window.CardTemplates.render(mount, templateId, cardData);

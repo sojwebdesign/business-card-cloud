@@ -288,6 +288,14 @@ function buildFieldEditor() {
     fieldEditor.appendChild(photoSection);
     fieldEditor.appendChild(optionalSection);
 
+    if (publishState.published && publishState.shareUrl) {
+        const guideSection = document.createElement('div');
+        guideSection.className = 'sidebar-section';
+        guideSection.id = 'editorHomeScreenGuideMount';
+        fieldEditor.appendChild(guideSection);
+        HomeScreenGuide.mount(guideSection, { shareUrl: publishState.shareUrl, variant: 'compact' });
+    }
+
     if (publishState.published && publishState.slug && publishState.editKey) {
         const dangerSection = document.createElement('div');
         dangerSection.className = 'sidebar-section sidebar-danger-zone';
@@ -556,12 +564,7 @@ function bindShareActions() {
     saveQrBtn?.addEventListener('click', saveQrToPhotos);
     addToHomeBtn?.addEventListener('click', () => {
         if (!publishState.shareUrl) return;
-        const link = document.getElementById('addToHomeCardLink');
-        if (link) {
-            link.href = publishState.shareUrl;
-            link.textContent = 'your card page';
-        }
-        addToHomeModal?.classList.remove('hidden');
+        openHomeScreenGuideModal(publishState.shareUrl);
         downloadDropdown.classList.remove('open');
     });
     document.getElementById('downloadVcfBtn')?.addEventListener('click', downloadVcf);
@@ -649,7 +652,21 @@ function showPublishModal(updated) {
     document.getElementById('shareUrlInput').value = publishState.shareUrl || '';
     document.getElementById('contactUrlInput').value = publishState.contactUrl || '';
     document.getElementById('editUrlInput').value = publishState.editUrl || '';
+    refreshHomeScreenGuides(publishState.shareUrl);
     publishModal?.classList.remove('hidden');
+}
+
+function openHomeScreenGuideModal(shareUrl) {
+    HomeScreenGuide.mount(document.getElementById('homeScreenGuideModalMount'), { shareUrl });
+    addToHomeModal?.classList.remove('hidden');
+}
+
+function refreshHomeScreenGuides(shareUrl) {
+    const publishMount = document.getElementById('homeScreenGuidePublishMount');
+    if (publishMount) HomeScreenGuide.mount(publishMount, { shareUrl });
+
+    const editorMount = document.getElementById('editorHomeScreenGuideMount');
+    if (editorMount) HomeScreenGuide.mount(editorMount, { shareUrl, variant: 'compact' });
 }
 
 function updateShareMenuState() {
@@ -659,7 +676,7 @@ function updateShareMenuState() {
     }
     if (publishHint) {
         publishHint.textContent = isPublished
-            ? 'Your card is live. Update anytime — your links and QR stay the same.'
+            ? 'Your card is live. Use Home Screen setup guide for iPhone and Android steps.'
             : 'Save your card online to get your card link, contact page, and QR code.';
     }
     if (qrHint) {
@@ -737,6 +754,7 @@ function bindRecoverModal() {
 
     document.getElementById('closeRecoverModal')?.addEventListener('click', () => {
         recoverModal?.classList.add('hidden');
+        document.getElementById('homeScreenGuideRecoverMount')?.classList.add('hidden');
     });
 
     recoverModal?.addEventListener('click', (e) => {
@@ -762,6 +780,19 @@ function bindRecoverModal() {
 
             resultsEl.classList.remove('hidden');
             resultsEl.innerHTML = '';
+
+            const recoverGuideMount = document.getElementById('homeScreenGuideRecoverMount');
+            if (recoverGuideMount && result.cards.length) {
+                recoverGuideMount.classList.remove('hidden');
+                HomeScreenGuide.mount(recoverGuideMount, {
+                    shareUrl: result.cards[0].shareUrl,
+                    variant: 'compact'
+                });
+            } else if (recoverGuideMount) {
+                recoverGuideMount.classList.add('hidden');
+                recoverGuideMount.innerHTML = '';
+            }
+
             result.cards.forEach((card) => {
                 const item = document.createElement('div');
                 item.className = 'recover-card-item';
@@ -785,6 +816,7 @@ function bindRecoverModal() {
                         <button type="button" class="btn btn-secondary" data-action="copy-edit">Copy edit link</button>
                         <button type="button" class="btn btn-secondary" data-action="copy-contact">Copy contact link</button>
                         <button type="button" class="btn btn-secondary" data-action="copy-share">Copy my card link</button>
+                        <button type="button" class="btn btn-secondary" data-action="home-screen">Home Screen setup</button>
                         <button type="button" class="btn btn-secondary btn-danger" data-action="delete">Delete</button>
                     </div>`;
 
@@ -799,6 +831,9 @@ function bindRecoverModal() {
                 });
                 item.querySelector('[data-action="copy-share"]').addEventListener('click', () => {
                     copyToClipboard(card.shareUrl, 'My card link copied');
+                });
+                item.querySelector('[data-action="home-screen"]').addEventListener('click', () => {
+                    openHomeScreenGuideModal(card.shareUrl);
                 });
                 item.querySelector('[data-action="delete"]').addEventListener('click', async () => {
                     if (!confirm(`Delete ${card.fullName}'s card? This cannot be undone.`)) return;

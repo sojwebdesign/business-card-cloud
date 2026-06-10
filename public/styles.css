@@ -2988,6 +2988,157 @@ a.sojern-card__contact-link:focus-visible {
     margin-bottom: var(--space-2);
 }
 
+/* ─── Home Screen setup guide ─── */
+
+.publish-guide-heading {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 var(--space-3);
+}
+
+.publish-url-block--guide {
+    margin-top: var(--space-5);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--border-light);
+}
+
+.home-screen-guide-recover {
+    margin-bottom: var(--space-4);
+}
+
+.home-screen-guide__intro,
+.home-screen-guide__update-note {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    line-height: 1.55;
+    margin: 0 0 var(--space-3);
+}
+
+.home-screen-guide__link-row {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    margin-bottom: var(--space-3);
+    font-size: 0.8125rem;
+}
+
+.home-screen-guide__link-row--pending {
+    color: var(--text-muted);
+}
+
+.home-screen-guide__link-label {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.home-screen-guide__link {
+    color: var(--brand-primary);
+    word-break: break-all;
+}
+
+.home-screen-guide__tabs {
+    display: flex;
+    gap: var(--space-2);
+    margin-bottom: var(--space-3);
+}
+
+.home-screen-guide__tab {
+    flex: 1;
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    background: var(--bg-hover);
+    color: var(--text-secondary);
+    font-family: var(--font-sans);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.home-screen-guide__tab.is-active {
+    background: var(--brand-primary);
+    border-color: var(--brand-primary);
+    color: #ffffff;
+}
+
+.home-screen-guide__steps {
+    margin: 0;
+    padding-left: var(--space-5);
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    line-height: 1.6;
+}
+
+.home-screen-guide__steps li {
+    margin-bottom: var(--space-2);
+}
+
+.home-screen-guide__steps li:last-child {
+    margin-bottom: 0;
+}
+
+.home-screen-guide--compact {
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    background: var(--bg-hover);
+}
+
+.home-screen-guide__summary {
+    padding: var(--space-3) var(--space-4);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    cursor: pointer;
+    list-style: none;
+}
+
+.home-screen-guide__summary::-webkit-details-marker {
+    display: none;
+}
+
+.home-screen-guide__summary::before {
+    content: '▸ ';
+    color: var(--brand-primary);
+}
+
+.home-screen-guide--compact[open] .home-screen-guide__summary::before {
+    content: '▾ ';
+}
+
+.home-screen-guide__body {
+    padding: 0 var(--space-4) var(--space-4);
+    border-top: 1px solid var(--border-light);
+}
+
+.share-home-screen-guide {
+    width: 100%;
+    max-width: 480px;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    background: var(--bg-white);
+    overflow: hidden;
+}
+
+.share-home-screen-guide summary {
+    padding: var(--space-3) var(--space-4);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    cursor: pointer;
+    list-style: none;
+}
+
+.share-home-screen-guide summary::-webkit-details-marker {
+    display: none;
+}
+
+.share-home-screen-guide .home-screen-guide--full {
+    padding: 0 var(--space-4) var(--space-4);
+    border-top: 1px solid var(--border-light);
+}
+
 /* ─── Photo crop modal ─── */
 
 .modal-card--crop {

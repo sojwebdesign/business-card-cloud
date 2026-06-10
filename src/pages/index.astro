@@ -59,7 +59,7 @@
                         <button class="btn btn-secondary download-confirm" id="copyPublicLinkBtn" disabled>Copy my card link</button>
                         <button class="btn btn-secondary download-confirm" id="saveQrBtn" disabled>Save QR to Photos</button>
                         <div class="download-divider"></div>
-                        <button class="btn btn-secondary download-confirm" id="addToHomeBtn" disabled>Add to Home Screen</button>
+                        <button class="btn btn-secondary download-confirm" id="addToHomeBtn" disabled>Home Screen setup guide</button>
                         <button class="btn btn-secondary download-confirm" id="downloadVcfBtn">Download Contact (.vcf)</button>
                     </div>
                 </div>
@@ -145,7 +145,7 @@
                                 <circle cx="48" cy="48" r="43.81" fill="#e05f3e"/>
                                 <polyline points="22.41 48 38.83 66.11 72.85 34.38" fill="none" stroke="#fff" stroke-linecap="round" stroke-miterlimit="10" stroke-width="11"/>
                             </svg>
-                            Add to Home Screen for one-tap access at conferences
+                            Add <strong>My card</strong> to your Home Screen (iPhone or Android) for one-tap QR access at conferences
                         </div>
                         <div class="hint">
                             <svg width="14" height="14" viewBox="0 0 96 96">
@@ -261,6 +261,11 @@
                 <p class="helper-text">Bookmark to update your card. Your links and QR stay the same.</p>
             </div>
 
+            <div class="publish-url-block publish-url-block--guide">
+                <h3 class="publish-guide-heading">Add to Home Screen</h3>
+                <div id="homeScreenGuidePublishMount"></div>
+            </div>
+
             <div class="publish-modal-actions">
                 <button type="button" class="btn btn-secondary" id="publishSaveQrBtn">Save QR to Photos</button>
                 <button type="button" class="btn btn-primary" id="publishDoneBtn">Done</button>
@@ -270,17 +275,10 @@
 
     <!-- Add to Home Screen instructions -->
     <div class="modal-overlay hidden" id="addToHomeModal">
-        <div class="modal-card">
+        <div class="modal-card modal-card--wide">
             <button type="button" class="modal-close" id="closeHomeModal" aria-label="Close">&times;</button>
             <h2 class="modal-title">Add to Home Screen</h2>
-            <p class="modal-text">On your <strong>phone</strong>, open your <strong>My card</strong> page in Safari, then:</p>
-            <ol class="modal-steps">
-                <li>Open <a href="#" id="addToHomeCardLink" target="_blank" rel="noopener">your card page</a> on your iPhone</li>
-                <li>Tap the <strong>Share</strong> button (square with arrow)</li>
-                <li>Scroll down and tap <strong>Add to Home Screen</strong></li>
-                <li>Tap <strong>Add</strong> — your card opens like an app</li>
-            </ol>
-            <p class="helper-text">On Android, use Chrome menu → Add to Home screen.</p>
+            <div id="homeScreenGuideModalMount"></div>
         </div>
     </div>
 
@@ -289,7 +287,8 @@
         <div class="modal-card modal-card--wide">
             <button type="button" class="modal-close" id="closeRecoverModal" aria-label="Close">&times;</button>
             <h2 class="modal-title">Find my card</h2>
-            <p class="modal-text">Enter the email on your card to recover your edit link or delete old cards.</p>
+            <p class="modal-text">Enter the email on your card to recover your edit link, get Home Screen setup steps, or delete old cards.</p>
+            <div id="homeScreenGuideRecoverMount" class="home-screen-guide-recover hidden"></div>
             <form id="recoverForm" class="recover-form">
                 <div class="form-field">
                     <label for="recoverEmail">Work email</label>
@@ -309,6 +308,7 @@
     <script is:inline src="/business-card/card-icons.js"></script>
     <script is:inline src="/business-card/card-templates.js"></script>
     <script is:inline src="/business-card/photo-crop.js"></script>
+    <script is:inline src="/business-card/home-screen-guide.js"></script>
     <script is:inline src="/business-card/app.js"></script>
 </body>
 </html>
