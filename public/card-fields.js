@@ -20,7 +20,7 @@ window.CardFields = {
             required: true,
             alwaysOn: true,
             section: 'required',
-            placeholder: 'Jane Smith',
+            placeholder: 'Your full name',
             vcard: 'FN'
         },
         jobTitle: {
@@ -30,7 +30,7 @@ window.CardFields = {
             required: true,
             alwaysOn: true,
             section: 'required',
-            placeholder: 'Art Director',
+            placeholder: 'Senior Account Executive',
             vcard: 'TITLE'
         },
         email: {
@@ -40,7 +40,7 @@ window.CardFields = {
             required: true,
             alwaysOn: true,
             section: 'required',
-            placeholder: 'jane@sojern.com',
+            placeholder: 'name@sojern.com',
             inputType: 'email',
             labelOptions: ['Work', 'Personal', 'None'],
             defaultLabel: 'Work',

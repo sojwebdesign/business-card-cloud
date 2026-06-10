@@ -62,15 +62,22 @@ const manifestUrl = `/business-card/${slug}/manifest.webmanifest`;
                 Share Contact
             </button>
             <p class="helper-text share-contact-hint">Send via AirDrop or Messages to a nearby iPhone</p>
-
-            <details class="share-home-screen-guide" open>
-                <summary>Save to your phone's Home Screen</summary>
-                <div id="homeScreenGuideShareMount"></div>
-            </details>
         </div>
 
         <div id="cardPreviewMount" class="sojern-card-mount public-card-mount"></div>
+
+        <p class="share-home-link-wrap">
+            <button type="button" class="share-home-link" id="shareHomeScreenLink">Save to your phone's Home Screen</button>
+        </p>
     </main>
+
+    <div class="modal-overlay hidden" id="shareHomeScreenModal">
+        <div class="modal-card modal-card--wide modal-card--scroll">
+            <button type="button" class="modal-close" id="shareHomeScreenClose" aria-label="Close">&times;</button>
+            <h2 class="modal-title">Add to Home Screen</h2>
+            <div id="homeScreenGuideShareMount"></div>
+        </div>
+    </div>
 
     <script is:inline src="/business-card/vendor/qrcode.min.js"></script>
     <script is:inline src="/business-card/card-fields.js"></script>
@@ -79,10 +86,6 @@ const manifestUrl = `/business-card/${slug}/manifest.webmanifest`;
     <script is:inline src="/business-card/contact-page.js"></script>
     <script is:inline src="/business-card/home-screen-guide.js"></script>
     <script is:inline define:vars={{ cardData: card.cardData, templateId, contactUrl, vcfUrl, fullName, shareUrl: urls.shareUrl }}>
-        HomeScreenGuide.mount(document.getElementById('homeScreenGuideShareMount'), {
-            shareUrl,
-            variant: 'full'
-        });
         const mount = document.getElementById('cardPreviewMount');
         if (mount && window.CardTemplates) {
             window.CardTemplates.render(mount, templateId, cardData);
@@ -96,6 +99,23 @@ const manifestUrl = `/business-card/${slug}/manifest.webmanifest`;
                 color: { dark: '#242452', light: '#ffffff' }
             });
         }
+
+        const homeScreenModal = document.getElementById('shareHomeScreenModal');
+        const openHomeScreenGuide = () => {
+            HomeScreenGuide.mount(document.getElementById('homeScreenGuideShareMount'), {
+                shareUrl,
+                variant: 'full'
+            });
+            homeScreenModal?.classList.remove('hidden');
+        };
+
+        document.getElementById('shareHomeScreenLink')?.addEventListener('click', openHomeScreenGuide);
+        document.getElementById('shareHomeScreenClose')?.addEventListener('click', () => {
+            homeScreenModal?.classList.add('hidden');
+        });
+        homeScreenModal?.addEventListener('click', (e) => {
+            if (e.target === homeScreenModal) homeScreenModal.classList.add('hidden');
+        });
 
         document.getElementById('shareContactBtn')?.addEventListener('click', async () => {
             const btn = document.getElementById('shareContactBtn');
