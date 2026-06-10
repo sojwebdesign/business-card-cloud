@@ -68,6 +68,15 @@ window.CardTemplates = {
         tryHeader(template.headerImage, template.headerPlaceholder);
     },
 
+    setMultilineText(element, text) {
+        element.textContent = '';
+        const lines = String(text ?? '').split(/\r?\n/);
+        lines.forEach((line, index) => {
+            if (index > 0) element.appendChild(document.createElement('br'));
+            element.appendChild(document.createTextNode(line));
+        });
+    },
+
     getRowHref(fieldId, def, data) {
         if (fieldId === 'address') return null;
         if (!data?.value) return null;
@@ -197,7 +206,11 @@ window.CardTemplates = {
                     primary.rel = 'noopener noreferrer';
                 }
             }
-            primary.textContent = displayText;
+            if (isAddress) {
+                this.setMultilineText(primary, displayText);
+            } else {
+                primary.textContent = displayText;
+            }
 
             textWrap.appendChild(primary);
 

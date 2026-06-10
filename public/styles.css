@@ -2636,9 +2636,10 @@ body.dark-mode .effect-option-badge {
     white-space: nowrap;
 }
 
-.sojern-card__contact-primary--address {
+.sojern-card__contact-primary.sojern-card__contact-primary--address {
     white-space: pre-line;
     font-weight: 600;
+    word-break: break-word;
 }
 
 a.sojern-card__contact-link {
@@ -3281,6 +3282,11 @@ a.sojern-card__contact-link:focus-visible {
     .sojern-card__contact-primary {
         white-space: normal;
         word-break: break-all;
+    }
+
+    .sojern-card__contact-primary.sojern-card__contact-primary--address {
+        white-space: pre-line;
+        word-break: break-word;
     }
 }
 
