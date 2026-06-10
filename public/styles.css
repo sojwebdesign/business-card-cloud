@@ -1313,10 +1313,12 @@ details > summary::-webkit-details-marker {
     min-width: 200px;
     z-index: 100;
     display: none;
+    flex-direction: column;
+    gap: var(--space-2);
 }
 
 .download-dropdown.open .download-menu {
-    display: block;
+    display: flex;
 }
 
 /* Tabbed Download Menu */
@@ -1369,7 +1371,7 @@ details > summary::-webkit-details-marker {
 .download-divider {
     height: 1px;
     background: var(--border-light);
-    margin: var(--space-3) 0;
+    margin: var(--space-1) 0;
 }
 
 /* Color mode buttons (dark/light overlay selector) */

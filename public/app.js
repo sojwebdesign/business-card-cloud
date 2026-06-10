@@ -296,14 +296,6 @@ function buildFieldEditor() {
     fieldEditor.appendChild(photoSection);
     fieldEditor.appendChild(optionalSection);
 
-    if (publishState.published && publishState.shareUrl) {
-        const guideSection = document.createElement('div');
-        guideSection.className = 'sidebar-section';
-        guideSection.id = 'editorHomeScreenGuideMount';
-        fieldEditor.appendChild(guideSection);
-        HomeScreenGuide.mount(guideSection, { shareUrl: publishState.shareUrl, variant: 'compact' });
-    }
-
     if (publishState.published && publishState.slug && publishState.editKey) {
         const dangerSection = document.createElement('div');
         dangerSection.className = 'sidebar-section sidebar-danger-zone';
@@ -479,7 +471,7 @@ function proceedToEditor() {
     updateShareMenuState();
 }
 
-function resetApp() {
+function clearAppState() {
     cardData = CardFields.createDefaultCardData();
     currentTemplate = 'sojern';
     publishState = { slug: null, editKey: null, shareUrl: null, contactUrl: null, editUrl: null, published: false };
@@ -491,8 +483,18 @@ function resetApp() {
     cardData.photoSourceUrl = null;
     cardData.photoCrop = null;
     renderTemplateGrid();
+}
+
+function resetApp() {
+    clearAppState();
     showHome();
     showToast('Started over', 'success');
+}
+
+function returnToHomeAfterDelete() {
+    clearAppState();
+    showHome();
+    window.history.replaceState({}, '', window.location.pathname);
 }
 
 function renderCardPreview() {
@@ -673,9 +675,6 @@ function openHomeScreenGuideModal(shareUrl, options = {}) {
 function refreshHomeScreenGuides(shareUrl) {
     const publishMount = document.getElementById('homeScreenGuidePublishMount');
     if (publishMount) HomeScreenGuide.mount(publishMount, { shareUrl });
-
-    const editorMount = document.getElementById('editorHomeScreenGuideMount');
-    if (editorMount) HomeScreenGuide.mount(editorMount, { shareUrl, variant: 'compact' });
 }
 
 function updateShareMenuState() {
@@ -886,23 +885,36 @@ function formatRecoverTimestamp(iso) {
 async function deleteCardBySlug(slug, editKey) {
     if (!slug || !editKey) throw new Error('Missing card credentials');
 
-    const response = await fetch(`/business-card/api/cards/${encodeURIComponent(slug)}?key=${encodeURIComponent(editKey)}`, {
-        method: 'DELETE'
+    const response = await fetch('/business-card/api/cards/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug, editKey })
     });
     const result = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(result.error || 'Delete failed');
+    if (!response.ok) throw new Error(result.error || `Delete failed (${response.status})`);
 }
 
 async function deletePublishedCard() {
     if (!publishState.slug || !publishState.editKey) return;
     if (!confirm('Delete this card permanently? All links and QR codes will stop working.')) return;
 
+    const btn = document.getElementById('deleteCardBtn');
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Deleting…';
+    }
+
     try {
         await deleteCardBySlug(publishState.slug, publishState.editKey);
+        returnToHomeAfterDelete();
         showToast('Card deleted', 'success');
-        resetApp();
     } catch (error) {
         showToast(error.message || 'Could not delete card', 'error');
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = 'Delete this card';
+        }
     }
 }
 
