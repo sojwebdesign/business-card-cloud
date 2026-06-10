@@ -60,7 +60,9 @@ function init() {
     bindModal();
     bindPublishModal();
     bindRecoverModal();
+    bindDeleteConfirmModal();
     loadEditFromUrl();
+    loadDeleteFromUrl();
 }
 
 function bindTheme() {
@@ -119,7 +121,6 @@ function bindPublishModal() {
     document.getElementById('publishDoneBtn')?.addEventListener('click', () => publishModal.classList.add('hidden'));
     document.getElementById('copyShareUrlBtn')?.addEventListener('click', () => copyText('shareUrlInput', 'My card link copied'));
     document.getElementById('copyContactUrlBtn')?.addEventListener('click', () => copyText('contactUrlInput', 'Contact link copied'));
-    document.getElementById('copyEditUrlBtn')?.addEventListener('click', () => copyText('editUrlInput', 'Edit link copied'));
     document.getElementById('publishSaveQrBtn')?.addEventListener('click', saveQrToPhotos);
 }
 
@@ -297,6 +298,15 @@ function buildFieldEditor() {
     fieldEditor.appendChild(optionalSection);
 
     if (publishState.published && publishState.slug && publishState.editKey) {
+        const securitySection = document.createElement('div');
+        securitySection.className = 'sidebar-section';
+        securitySection.innerHTML = `
+            <h3 class="sidebar-title">Edit link security</h3>
+            <p class="helper-text">Invalidate any old edit links you may have saved or shared. Request a fresh link anytime via <strong>Find my card</strong>.</p>
+            <button type="button" class="btn btn-secondary" id="rotateEditKeyBtn">Invalidate old edit links</button>`;
+        securitySection.querySelector('#rotateEditKeyBtn').addEventListener('click', rotateEditKey);
+        fieldEditor.appendChild(securitySection);
+
         const dangerSection = document.createElement('div');
         dangerSection.className = 'sidebar-section sidebar-danger-zone';
         dangerSection.innerHTML = `
@@ -661,7 +671,6 @@ function showPublishModal(updated) {
     document.getElementById('publishModalTitle').textContent = updated ? 'Card updated' : 'Card published';
     document.getElementById('shareUrlInput').value = publishState.shareUrl || '';
     document.getElementById('contactUrlInput').value = publishState.contactUrl || '';
-    document.getElementById('editUrlInput').value = publishState.editUrl || '';
     refreshHomeScreenGuides(publishState.shareUrl);
     publishModal?.classList.remove('hidden');
 }
@@ -697,41 +706,189 @@ function updateShareMenuState() {
     });
 }
 
+function loadCardIntoEditor(result, successMessage = 'Loaded your published card for editing') {
+    cardData = result.cardData;
+    currentTemplate = result.templateId || 'sojern';
+    const urls = normalizePublishedUrls(result);
+    publishState = {
+        slug: result.slug,
+        editKey: result.editKey,
+        shareUrl: urls.shareUrl,
+        contactUrl: urls.contactUrl,
+        editUrl: urls.editUrl,
+        published: true
+    };
+
+    templateUserName.textContent = cardData.fullName || 'your card';
+    syncBasicsPhotoUI();
+    proceedToEditor();
+    showToast(successMessage, 'success');
+    window.history.replaceState({}, '', window.location.pathname);
+}
+
 async function loadEditFromUrl() {
     const params = new URLSearchParams(window.location.search);
+    const magicToken = params.get('token');
     const slug = params.get('edit');
     const key = params.get('key');
+
+    if (magicToken) {
+        try {
+            const response = await fetch('/business-card/api/cards/verify-magic', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token: magicToken })
+            });
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.error || 'Could not verify edit link');
+            loadCardIntoEditor(result, 'Secure edit link accepted');
+        } catch (error) {
+            console.error(error);
+            showToast(error.message || 'Could not open edit link', 'error');
+        }
+        return;
+    }
+
     if (!slug || !key) return;
 
     try {
         const response = await fetch(`/business-card/api/cards/${encodeURIComponent(slug)}?key=${encodeURIComponent(key)}`);
         const result = await response.json();
-        if (!response.ok) {
-            throw new Error(result.error || 'Could not load card');
-        }
-
-        cardData = result.cardData;
-        currentTemplate = result.templateId || 'sojern';
-        const urls = normalizePublishedUrls(result);
-        publishState = {
-            slug: result.slug,
-            editKey: result.editKey,
-            shareUrl: urls.shareUrl,
-            contactUrl: urls.contactUrl,
-            editUrl: urls.editUrl,
-            published: true
-        };
-
-        templateUserName.textContent = cardData.fullName || 'your card';
-        syncBasicsPhotoUI();
-        proceedToEditor();
-        showToast('Loaded your published card for editing', 'success');
-
-        const cleanUrl = `${window.location.pathname}`;
-        window.history.replaceState({}, '', cleanUrl);
+        if (!response.ok) throw new Error(result.error || 'Could not load card');
+        loadCardIntoEditor(result);
     } catch (error) {
         console.error(error);
         showToast(error.message || 'Could not load card for editing', 'error');
+    }
+}
+
+async function requestEditLink(email, slug) {
+    const response = await fetch('/business-card/api/cards/request-edit-link', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, slug })
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || 'Could not send edit link');
+    return result.message;
+}
+
+async function requestDeleteLink(email, slug) {
+    const response = await fetch('/business-card/api/cards/request-delete-link', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, slug })
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || 'Could not send delete confirmation');
+    return result.message;
+}
+
+let pendingDeleteToken = null;
+
+function bindDeleteConfirmModal() {
+    const modal = document.getElementById('deleteConfirmModal');
+    const close = () => {
+        pendingDeleteToken = null;
+        modal?.classList.add('hidden');
+    };
+
+    document.getElementById('closeDeleteConfirmModal')?.addEventListener('click', close);
+    document.getElementById('cancelDeleteConfirmBtn')?.addEventListener('click', close);
+    modal?.addEventListener('click', (event) => {
+        if (event.target === modal) close();
+    });
+
+    document.getElementById('confirmDeleteBtn')?.addEventListener('click', async () => {
+        if (!pendingDeleteToken) return;
+        const btn = document.getElementById('confirmDeleteBtn');
+        if (btn) {
+            btn.disabled = true;
+            btn.textContent = 'Deleting…';
+        }
+
+        try {
+            const response = await fetch('/business-card/api/cards/confirm-delete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token: pendingDeleteToken })
+            });
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.error || 'Could not delete card');
+            close();
+            showToast(`${result.fullName || 'Card'} deleted permanently`, 'success');
+        } catch (error) {
+            showToast(error.message || 'Could not delete card', 'error');
+        } finally {
+            if (btn) {
+                btn.disabled = false;
+                btn.textContent = 'Delete permanently';
+            }
+        }
+    });
+}
+
+async function loadDeleteFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    const deleteToken = params.get('delete');
+    if (!deleteToken) return;
+
+    const modal = document.getElementById('deleteConfirmModal');
+    const textEl = document.getElementById('deleteConfirmText');
+
+    try {
+        const response = await fetch('/business-card/api/cards/preview-delete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token: deleteToken })
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || 'Invalid delete link');
+
+        pendingDeleteToken = deleteToken;
+        if (textEl) {
+            textEl.textContent = `Permanently delete ${result.fullName}'s card? All links and QR codes will stop working. This cannot be undone.`;
+        }
+        modal?.classList.remove('hidden');
+        window.history.replaceState({}, '', window.location.pathname);
+    } catch (error) {
+        console.error(error);
+        showToast(error.message || 'Could not open delete link', 'error');
+        window.history.replaceState({}, '', window.location.pathname);
+    }
+}
+
+async function rotateEditKey() {
+    if (!publishState.slug || !publishState.editKey) return;
+    if (!confirm('Invalidate all previously saved edit links? You can request a new link via Find my card.')) return;
+
+    const btn = document.getElementById('rotateEditKeyBtn');
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Invalidating…';
+    }
+
+    try {
+        const response = await fetch('/business-card/api/cards/rotate-edit-key', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                slug: publishState.slug,
+                editKey: publishState.editKey
+            })
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || 'Could not invalidate edit links');
+        publishState.editKey = result.editKey;
+        publishState.editUrl = `${CARD_PUBLIC_ORIGIN}/business-card/?edit=${publishState.slug}&key=${result.editKey}`;
+        showToast('Old edit links invalidated', 'success');
+    } catch (error) {
+        showToast(error.message || 'Could not invalidate edit links', 'error');
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = 'Invalidate old edit links';
+        }
     }
 }
 
@@ -823,19 +980,27 @@ function bindRecoverModal() {
                         </div>
                     </div>
                     <div class="recover-card-actions">
-                        <button type="button" class="btn btn-primary" data-action="edit">Open to edit</button>
-                        <button type="button" class="btn btn-secondary" data-action="copy-edit">Copy edit link</button>
+                        <button type="button" class="btn btn-primary" data-action="request-edit">Email me an edit link</button>
                         <button type="button" class="btn btn-secondary" data-action="copy-contact">Copy contact link</button>
                         <button type="button" class="btn btn-secondary" data-action="copy-share">Copy my card link</button>
                         <button type="button" class="btn btn-secondary" data-action="home-screen">Home Screen setup</button>
-                        <button type="button" class="btn btn-secondary btn-danger" data-action="delete">Delete</button>
+                        <button type="button" class="btn btn-secondary btn-danger" data-action="request-delete">Email delete confirmation</button>
                     </div>`;
 
-                item.querySelector('[data-action="edit"]').addEventListener('click', () => {
-                    window.location.href = card.editUrl;
-                });
-                item.querySelector('[data-action="copy-edit"]').addEventListener('click', () => {
-                    copyToClipboard(card.editUrl, 'Edit link copied');
+                item.querySelector('[data-action="request-edit"]').addEventListener('click', async (event) => {
+                    const btn = event.currentTarget;
+                    const originalText = btn.textContent;
+                    btn.disabled = true;
+                    btn.textContent = 'Sending…';
+                    try {
+                        const message = await requestEditLink(email, card.slug);
+                        showToast(message, 'success');
+                    } catch (error) {
+                        showToast(error.message || 'Could not send edit link', 'error');
+                    } finally {
+                        btn.disabled = false;
+                        btn.textContent = originalText;
+                    }
                 });
                 item.querySelector('[data-action="copy-contact"]').addEventListener('click', () => {
                     copyToClipboard(card.contactUrl, 'Contact link copied');
@@ -846,17 +1011,19 @@ function bindRecoverModal() {
                 item.querySelector('[data-action="home-screen"]').addEventListener('click', () => {
                     openHomeScreenGuideModal(card.shareUrl, { stack: true });
                 });
-                item.querySelector('[data-action="delete"]').addEventListener('click', async () => {
-                    if (!confirm(`Delete ${card.fullName}'s card? This cannot be undone.`)) return;
+                item.querySelector('[data-action="request-delete"]').addEventListener('click', async (event) => {
+                    const btn = event.currentTarget;
+                    const originalText = btn.textContent;
+                    btn.disabled = true;
+                    btn.textContent = 'Sending…';
                     try {
-                        await deleteCardBySlug(card.slug, card.editKey);
-                        item.remove();
-                        if (!resultsEl.children.length) {
-                            resultsEl.innerHTML = '<p class="helper-text">No cards found.</p>';
-                        }
-                        showToast('Card deleted', 'success');
+                        const message = await requestDeleteLink(email, card.slug);
+                        showToast(message, 'success');
                     } catch (error) {
-                        showToast(error.message || 'Could not delete card', 'error');
+                        showToast(error.message || 'Could not send delete confirmation', 'error');
+                    } finally {
+                        btn.disabled = false;
+                        btn.textContent = originalText;
                     }
                 });
 

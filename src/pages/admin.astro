@@ -1,0 +1,60 @@
+---
+import { APP_NAME } from '../lib/brand-assets';
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{APP_NAME} Admin</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/business-card/styles.css">
+</head>
+<body>
+    <div class="app-container admin-page">
+        <header class="header">
+            <div class="logo">
+                <img class="logo-image logo-light" src="/business-card/Assets/DigiCard-Logo_Light.png" alt="Sojern DigiCard" width="300" height="41">
+                <img class="logo-image logo-dark" src="/business-card/Assets/DigiCard-Logo_Dark.png" alt="Sojern DigiCard" width="300" height="41">
+            </div>
+        </header>
+
+        <main class="admin-main">
+            <h1 class="admin-title">Card admin</h1>
+            <p class="helper-text admin-intro">Review and remove spam or unused cards. Requires <code>DIGICARD_ADMIN_KEY</code> configured in Webflow Cloud.</p>
+
+            <form id="adminAuthForm" class="admin-auth-form">
+                <div class="form-field">
+                    <label for="adminKey">Admin key</label>
+                    <input type="password" id="adminKey" autocomplete="current-password" required>
+                </div>
+                <button type="submit" class="btn btn-primary" id="loadCardsBtn">Load cards</button>
+            </form>
+
+            <div class="admin-status hidden" id="adminStatus"></div>
+
+            <div class="admin-table-wrap hidden" id="adminTableWrap">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Slug</th>
+                            <th>Updated</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminTableBody"></tbody>
+                </table>
+                <button type="button" class="btn btn-secondary hidden" id="loadMoreCardsBtn">Load more</button>
+            </div>
+        </main>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+    <script is:inline src="/business-card/admin.js"></script>
+</body>
+</html>

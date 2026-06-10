@@ -1,6 +1,5 @@
 import type { APIRoute } from 'astro';
-import { deleteCard, getCardsKV, PublishError } from '../../../lib/cards-store';
-import { enforceRateLimit, getClientIp, RateLimitError } from '../../../lib/rate-limit';
+import { PublishError, rotateEditKey } from '../../../lib/cards-store';
 
 export const prerender = false;
 
@@ -14,22 +13,14 @@ export const POST: APIRoute = async ({ request, locals }) => {
             return json({ error: 'Slug and edit key are required' }, 400);
         }
 
-        const kv = getCardsKV(locals);
-        const ip = getClientIp(request);
-        await enforceRateLimit(kv, 'delete-ip', ip, 10, 3600);
-
-        await deleteCard(locals, slug, editKey);
-
-        return json({ ok: true });
+        const newEditKey = await rotateEditKey(locals, slug, editKey);
+        return json({ ok: true, editKey: newEditKey });
     } catch (error) {
-        if (error instanceof RateLimitError) {
-            return json({ error: error.message }, error.status);
-        }
         if (error instanceof PublishError) {
             return json({ error: error.message }, error.status);
         }
-        console.error('Delete failed', error);
-        return json({ error: 'Failed to delete card' }, 500);
+        console.error('Rotate edit key failed', error);
+        return json({ error: 'Failed to rotate edit key' }, 500);
     }
 };
 

@@ -173,6 +173,98 @@ export async function deleteCard(
     await removeFromEmailIndex(kv, existing.cardData.email?.value || '', slug);
 }
 
+export interface AdminCardSummary {
+    slug: string;
+    fullName: string;
+    jobTitle: string;
+    email: string;
+    publishedAt: string;
+    updatedAt: string;
+}
+
+export async function listAllCards(
+    locals: App.Locals,
+    options?: { cursor?: string; limit?: number }
+): Promise<{ cards: AdminCardSummary[]; cursor?: string }> {
+    const kv = getCardsKV(locals);
+    const limit = Math.min(Math.max(options?.limit || 50, 1), 100);
+    const list = await kv.list({ prefix: KV_PREFIX, cursor: options?.cursor, limit });
+
+    const cards: AdminCardSummary[] = [];
+    for (const key of list.keys) {
+        const card = await kv.get<PublishedCard>(key.name, 'json');
+        if (!card) continue;
+        cards.push({
+            slug: card.slug,
+            fullName: card.cardData.fullName || '',
+            jobTitle: card.cardData.jobTitle || '',
+            email: card.cardData.email?.value?.toLowerCase().trim() || '',
+            publishedAt: card.publishedAt,
+            updatedAt: card.updatedAt
+        });
+    }
+
+    cards.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+    return {
+        cards,
+        cursor: list.list_complete ? undefined : list.cursor
+    };
+}
+
+export async function deleteCardAdmin(locals: App.Locals, slug: string): Promise<void> {
+    const existing = await getCardBySlug(locals, slug);
+    if (!existing) {
+        throw new PublishError('Card not found', 404);
+    }
+
+    const kv = getCardsKV(locals);
+    await kv.delete(kvKey(slug));
+    await removeFromEmailIndex(kv, existing.cardData.email?.value || '', slug);
+}
+
+export async function deleteCardByEmail(
+    locals: App.Locals,
+    slug: string,
+    email: string
+): Promise<void> {
+    const existing = await getCardBySlug(locals, slug);
+    if (!existing) {
+        throw new PublishError('Card not found', 404);
+    }
+
+    const cardEmail = existing.cardData.email?.value?.toLowerCase().trim();
+    const requestedEmail = email.toLowerCase().trim();
+    if (!cardEmail || cardEmail !== requestedEmail) {
+        throw new PublishError('Invalid delete credentials', 403);
+    }
+
+    const kv = getCardsKV(locals);
+    await kv.delete(kvKey(slug));
+    await removeFromEmailIndex(kv, cardEmail, slug);
+}
+
+export async function rotateEditKey(
+    locals: App.Locals,
+    slug: string,
+    editKey: string
+): Promise<string> {
+    const existing = await getCardBySlug(locals, slug);
+    if (!existing || existing.editKey !== editKey) {
+        throw new PublishError('Invalid edit credentials', 403);
+    }
+
+    const newEditKey = crypto.randomUUID();
+    const record: PublishedCard = {
+        ...existing,
+        editKey: newEditKey,
+        updatedAt: new Date().toISOString()
+    };
+
+    const kv = getCardsKV(locals);
+    await kv.put(kvKey(slug), JSON.stringify(record));
+    return newEditKey;
+}
+
 export class PublishError extends Error {
     status: number;
 

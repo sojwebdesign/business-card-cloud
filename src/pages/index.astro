@@ -239,14 +239,7 @@
                 <p class="helper-text">What prospects see when they scan your QR. No QR on this page — just Save to Contacts.</p>
             </div>
 
-            <div class="publish-url-block">
-                <label class="sub-label" for="editUrlInput">Edit link — keep private</label>
-                <div class="publish-url-row">
-                    <input type="text" class="publish-url-input" id="editUrlInput" readonly>
-                    <button type="button" class="btn btn-secondary" id="copyEditUrlBtn">Copy</button>
-                </div>
-                <p class="helper-text">Bookmark to update your card. Your links and QR stay the same.</p>
-            </div>
+            <p class="helper-text publish-edit-hint">To edit later, use <strong>Find my card</strong> on the home page — we'll email you a secure, one-time edit link.</p>
 
             <div class="publish-url-block publish-url-block--guide">
                 <h3 class="publish-guide-heading">Add to Home Screen</h3>
@@ -274,7 +267,7 @@
         <div class="modal-card modal-card--wide modal-card--scroll">
             <button type="button" class="modal-close" id="closeRecoverModal" aria-label="Close">&times;</button>
             <h2 class="modal-title">Find my card</h2>
-            <p class="modal-text">Enter the email on your card to recover your edit link, open Home Screen setup steps, or delete old cards.</p>
+            <p class="modal-text">Enter the email on your card to look up your links, request a secure edit link by email, or request delete confirmation by email.</p>
             <form id="recoverForm" class="recover-form">
                 <div class="form-field">
                     <label for="recoverEmail">Work email</label>
@@ -283,6 +276,19 @@
                 <button type="submit" class="btn btn-primary">Look up cards</button>
             </form>
             <div class="recover-results hidden" id="recoverResults"></div>
+        </div>
+    </div>
+
+    <!-- Delete confirmation (from email link) -->
+    <div class="modal-overlay hidden" id="deleteConfirmModal">
+        <div class="modal-card">
+            <button type="button" class="modal-close" id="closeDeleteConfirmModal" aria-label="Close">&times;</button>
+            <h2 class="modal-title">Confirm deletion</h2>
+            <p class="modal-text" id="deleteConfirmText">This will permanently delete your card and all its links.</p>
+            <div class="publish-modal-actions">
+                <button type="button" class="btn btn-secondary" id="cancelDeleteConfirmBtn">Cancel</button>
+                <button type="button" class="btn btn-secondary btn-danger" id="confirmDeleteBtn">Delete permanently</button>
+            </div>
         </div>
     </div>
 
