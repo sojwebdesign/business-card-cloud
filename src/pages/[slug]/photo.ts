@@ -11,7 +11,7 @@ export const GET: APIRoute = async ({ params, locals }) => {
     }
 
     const record = await getCardBySlug(locals, slug);
-    const photoDataUrl = record?.cardData?.photoDataUrl;
+    const photoDataUrl = record?.cardData?.hideHeadshot ? null : record?.cardData?.photoDataUrl;
     if (!photoDataUrl) {
         return new Response('Not found', { status: 404 });
     }

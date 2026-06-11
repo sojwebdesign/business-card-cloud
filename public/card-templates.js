@@ -102,8 +102,9 @@ window.CardTemplates = {
     render(container, templateId, cardData) {
         const template = this.getTemplate(templateId);
         const fields = window.CardFields;
+        const showHeadshot = fields.shouldDisplayHeadshot(cardData);
 
-        container.className = `sojern-card ${template.className}`;
+        container.className = `sojern-card ${template.className}${showHeadshot ? '' : ' sojern-card--no-headshot'}`;
         container.innerHTML = '';
 
         const header = document.createElement('div');
@@ -128,20 +129,24 @@ window.CardTemplates = {
         const profile = document.createElement('div');
         profile.className = 'sojern-card__profile';
 
-        const photoWrap = document.createElement('div');
-        photoWrap.className = 'sojern-card__photo-wrap';
+        if (showHeadshot) {
+            const photoWrap = document.createElement('div');
+            photoWrap.className = 'sojern-card__photo-wrap';
 
-        if (cardData.photoDataUrl) {
-            const img = document.createElement('img');
-            img.className = 'sojern-card__photo';
-            img.src = cardData.photoDataUrl;
-            img.alt = '';
-            photoWrap.appendChild(img);
-        } else {
-            const placeholder = document.createElement('div');
-            placeholder.className = 'sojern-card__photo sojern-card__photo--placeholder';
-            placeholder.innerHTML = `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>`;
-            photoWrap.appendChild(placeholder);
+            if (cardData.photoDataUrl) {
+                const img = document.createElement('img');
+                img.className = 'sojern-card__photo';
+                img.src = cardData.photoDataUrl;
+                img.alt = '';
+                photoWrap.appendChild(img);
+            } else {
+                const placeholder = document.createElement('div');
+                placeholder.className = 'sojern-card__photo sojern-card__photo--placeholder';
+                placeholder.innerHTML = `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>`;
+                photoWrap.appendChild(placeholder);
+            }
+
+            profile.appendChild(photoWrap);
         }
 
         const identity = document.createElement('div');
@@ -170,7 +175,6 @@ window.CardTemplates = {
             identity.appendChild(hl);
         }
 
-        profile.appendChild(photoWrap);
         profile.appendChild(identity);
 
         const contactList = document.createElement('ul');

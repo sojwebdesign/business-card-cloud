@@ -419,6 +419,23 @@ body.editor-open .editor-layout {
     border-color: var(--border-dark);
 }
 
+.btn-outline-brand {
+    background: var(--bg-white);
+    color: var(--brand-primary);
+    border: 1px solid var(--brand-primary);
+    text-decoration: none;
+}
+
+.btn-outline-brand:hover {
+    background: rgba(227, 95, 62, 0.08);
+    border-color: var(--brand-primary);
+    color: var(--brand-primary);
+}
+
+a.btn {
+    text-decoration: none;
+}
+
 /* ═══════════════════════════════════════════════════════════════════════════
    Upload Section
    ═══════════════════════════════════════════════════════════════════════════ */
@@ -2531,6 +2548,18 @@ body.dark-mode .effect-option-badge {
     align-items: flex-start;
 }
 
+.sojern-card--no-headshot .sojern-card__content {
+    padding-top: var(--space-6);
+}
+
+.editor-headshot-toggle {
+    margin: var(--space-3) 0;
+}
+
+.editor-photo-panel--hidden {
+    display: none;
+}
+
 .sojern-card__photo-wrap {
     margin-top: -72px;
     margin-bottom: var(--space-4);
@@ -2838,7 +2867,7 @@ a.sojern-card__contact-link:focus-visible {
     border: none;
     padding: 0;
     font-family: var(--font-sans);
-    font-size: 0.9375rem;
+    font-size: 0.875rem;
     font-weight: 600;
     color: var(--brand-primary);
     text-decoration: underline;
@@ -3440,7 +3469,7 @@ a.sojern-card__contact-link:focus-visible {
 .help-page .help-main {
     max-width: 720px;
     margin: 0 auto;
-    padding: var(--space-6) var(--space-4) var(--space-10);
+    padding: var(--space-8) var(--space-4) var(--space-10);
 }
 
 .help-header {
@@ -3517,8 +3546,9 @@ a.sojern-card__contact-link:focus-visible {
 
 .help-faq-item summary {
     padding: var(--space-4) var(--space-5);
-    font-size: 1rem;
+    font-size: 1.125rem;
     font-weight: 600;
+    line-height: 1.35;
     color: var(--text-primary);
     cursor: pointer;
     list-style: none;
@@ -3560,11 +3590,62 @@ a.sojern-card__contact-link:focus-visible {
     margin-top: 0;
 }
 
-.help-faq-body h3.help-subheading {
-    font-size: 0.875rem;
+.help-faq-body p,
+.help-faq-body dl,
+.help-faq-body ul,
+.help-faq-body ol {
+    margin: var(--space-3) 0;
+}
+
+.help-faq-body p:first-child,
+.help-faq-body dl:first-child,
+.help-faq-body ul:first-child,
+.help-faq-body ol:first-child {
+    margin-top: 0;
+}
+
+.help-faq-body a.btn {
+    color: inherit;
+    text-decoration: none;
+}
+
+.help-faq-body a.btn-primary {
+    color: #ffffff;
+}
+
+.help-faq-body a.btn-outline-brand,
+.help-faq-body a.btn-secondary {
+    color: var(--brand-primary);
+}
+
+.help-cta-wrap--top {
+    margin-top: var(--space-4);
+}
+
+.help-back-top {
+    margin-top: var(--space-5);
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--border-light);
+    font-size: 0.8125rem;
+    text-align: right;
+}
+
+.help-back-top a {
     font-weight: 600;
+    text-decoration: none;
+}
+
+.help-back-top a:hover,
+.help-back-top a:focus-visible {
+    text-decoration: underline;
+}
+
+.help-faq-body h3.help-subheading {
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.4;
     color: var(--text-primary);
-    margin: var(--space-4) 0 var(--space-2);
+    margin: var(--space-5) 0 var(--space-2);
 }
 
 .help-faq-body h3.help-subheading:first-child {
@@ -3599,9 +3680,11 @@ a.sojern-card__contact-link:focus-visible {
 }
 
 .help-def-list dt {
-    font-weight: 600;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.4;
     color: var(--text-primary);
-    margin-top: var(--space-3);
+    margin-top: var(--space-4);
 }
 
 .help-def-list dt:first-child {
@@ -3627,11 +3710,15 @@ a.sojern-card__contact-link:focus-visible {
 @media (max-width: 640px) {
     .help-faq-item summary {
         padding: var(--space-3) var(--space-4);
-        font-size: 0.9375rem;
+        font-size: 1.0625rem;
     }
 
     .help-faq-body {
         padding: 0 var(--space-4) var(--space-4);
+    }
+
+    .help-faq-body h3.help-subheading {
+        font-size: 0.975rem;
     }
 }
 

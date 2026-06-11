@@ -76,12 +76,14 @@ export function buildVCard(cardData: CardData, options: VCardOptions = {}): stri
 
     lines.push(`REV:${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]}Z`);
 
-    if (options.slug && options.origin && cardData.photoDataUrl) {
-        lines.push(`PHOTO;VALUE=uri:${options.origin}/business-card/${options.slug}/photo`);
-    }
+    if (!cardData.hideHeadshot) {
+        if (options.slug && options.origin && cardData.photoDataUrl) {
+            lines.push(`PHOTO;VALUE=uri:${options.origin}/business-card/${options.slug}/photo`);
+        }
 
-    const embedded = embeddedPhotoLine(cardData.photoDataUrl);
-    if (embedded) lines.push(embedded);
+        const embedded = embeddedPhotoLine(cardData.photoDataUrl);
+        if (embedded) lines.push(embedded);
+    }
 
     if (cardData.email?.value) {
         lines.push(`EMAIL${contactTypeParam(cardData.email.label)}:${escapeVCard(cardData.email.value)}`);

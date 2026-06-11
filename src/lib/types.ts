@@ -16,6 +16,7 @@ export interface CardData {
     photoDataUrl: string | null;
     photoSourceUrl?: string | null;
     photoCrop?: unknown;
+    hideHeadshot?: boolean;
     company: string;
     enabled: Record<string, boolean>;
     headline?: string;

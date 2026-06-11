@@ -30,10 +30,6 @@ const downloadDropdown = document.getElementById('downloadDropdown');
 const downloadBtn = document.getElementById('downloadBtn');
 const downloadMenu = document.getElementById('downloadMenu');
 const themeToggle = document.getElementById('themeToggle');
-const photoInput = document.getElementById('photoInput');
-const photoUpload = document.getElementById('photoUpload');
-const photoUploadContent = document.getElementById('photoUploadContent');
-const photoPreview = document.getElementById('photoPreview');
 const qrCanvas = document.getElementById('qrCanvas');
 const addToHomeModal = document.getElementById('addToHomeModal');
 const closeHomeModal = document.getElementById('closeHomeModal');
@@ -58,7 +54,6 @@ function init() {
     bindDownloadMenu();
     bindBasicsForm();
     bindNavigation();
-    bindPhotoUpload();
     bindShareActions();
     bindModal();
     bindPublishModal();
@@ -177,23 +172,6 @@ function bindNavigation() {
     startOverBtn.addEventListener('click', resetApp);
 }
 
-function bindPhotoUpload() {
-    photoUpload.addEventListener('click', () => photoInput.click());
-    photoInput.addEventListener('change', handlePhotoChange);
-}
-
-function handlePhotoChange() {
-    const file = photoInput.files?.[0];
-    if (!file) return;
-    readPhotoFile(file, () => {
-        syncBasicsPhotoUI();
-        if (!editorSection.classList.contains('hidden')) {
-            renderCardPreview();
-            buildFieldEditor();
-        }
-    });
-}
-
 function readPhotoFile(file, callback) {
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -220,7 +198,6 @@ function bindEditorPhotoEvents(section) {
         if (!file) return;
         readPhotoFile(file, () => {
             renderCardPreview();
-            syncBasicsPhotoUI();
             buildFieldEditor();
         });
     });
@@ -233,14 +210,6 @@ function bindEditorPhotoEvents(section) {
             buildFieldEditor();
         }, cardData.photoCrop);
     });
-}
-
-function syncBasicsPhotoUI() {
-    if (cardData.photoDataUrl) {
-        photoPreview.src = cardData.photoDataUrl;
-        photoPreview.classList.remove('hidden');
-        photoUploadContent.classList.add('hidden');
-    }
 }
 
 function renderTemplateGrid() {
@@ -292,19 +261,27 @@ function buildFieldEditor() {
 
     const photoSection = document.createElement('div');
     photoSection.className = 'sidebar-section';
+    const hideHeadshot = Boolean(cardData.hideHeadshot);
     photoSection.innerHTML = `
         <h3 class="sidebar-title">Headshot</h3>
-        <p class="helper-text">Upload then drag and zoom to set the focal point.</p>
-        <div class="photo-upload photo-upload--compact" id="editorPhotoUpload">
-            <input type="file" id="editorPhotoInput" accept="image/jpeg,image/jpg,image/png,image/webp" hidden>
-            <div class="photo-upload-content${cardData.photoDataUrl ? ' hidden' : ''}" id="editorPhotoPlaceholder">
-                <span>Upload headshot</span>
+        <p class="helper-text">Optional. Upload in the editor, then drag and zoom to set the focal point.</p>
+        <label class="checkbox-label editor-headshot-toggle">
+            <input type="checkbox" id="editorHideHeadshot"${hideHeadshot ? ' checked' : ''}>
+            <span class="checkmark"></span>
+            Do not display headshot
+        </label>
+        <div class="editor-photo-panel${hideHeadshot ? ' editor-photo-panel--hidden' : ''}" id="editorPhotoPanel">
+            <div class="photo-upload photo-upload--compact" id="editorPhotoUpload">
+                <input type="file" id="editorPhotoInput" accept="image/jpeg,image/jpg,image/png,image/webp" hidden>
+                <div class="photo-upload-content${cardData.photoDataUrl ? ' hidden' : ''}" id="editorPhotoPlaceholder">
+                    <span>Upload headshot</span>
+                </div>
+                <img class="photo-preview editor-photo-preview${cardData.photoDataUrl ? '' : ' hidden'}" id="editorPhotoPreview" src="${cardData.photoDataUrl || ''}" alt="">
             </div>
-            <img class="photo-preview editor-photo-preview${cardData.photoDataUrl ? '' : ' hidden'}" id="editorPhotoPreview" src="${cardData.photoDataUrl || ''}" alt="">
-        </div>
-        <div class="photo-actions">
-            <button type="button" class="btn btn-secondary" id="editorChangePhoto">Change photo</button>
-            <button type="button" class="btn btn-secondary${cardData.photoSourceUrl ? '' : ' hidden'}" id="editorAdjustCrop">Adjust crop</button>
+            <div class="photo-actions">
+                <button type="button" class="btn btn-secondary" id="editorChangePhoto">Change photo</button>
+                <button type="button" class="btn btn-secondary${cardData.photoSourceUrl ? '' : ' hidden'}" id="editorAdjustCrop">Adjust crop</button>
+            </div>
         </div>`;
 
     const optionalSection = document.createElement('div');
@@ -346,6 +323,11 @@ function buildFieldEditor() {
 
     photoSection.querySelector('#editorChangePhoto')?.addEventListener('click', () => {
         photoSection.querySelector('#editorPhotoInput').click();
+    });
+    photoSection.querySelector('#editorHideHeadshot')?.addEventListener('change', (event) => {
+        cardData.hideHeadshot = event.target.checked;
+        renderCardPreview();
+        buildFieldEditor();
     });
     bindEditorPhotoEvents(photoSection);
 }
@@ -517,11 +499,9 @@ function clearAppState() {
     pendingBasicsAfterDuplicate = null;
     updateShareMenuState();
     basicsForm.reset();
-    photoPreview.classList.add('hidden');
-    photoUploadContent.classList.remove('hidden');
-    photoInput.value = '';
     cardData.photoSourceUrl = null;
     cardData.photoCrop = null;
+    cardData.hideHeadshot = false;
     renderTemplateGrid();
 }
 
@@ -763,7 +743,7 @@ function loadCardIntoEditor(result, successMessage = 'Loaded your published card
     };
 
     templateUserName.textContent = cardData.fullName || 'your card';
-    syncBasicsPhotoUI();
+    cardData.hideHeadshot = Boolean(cardData.hideHeadshot);
     proceedToEditor();
     showToast(successMessage, 'success');
     window.history.replaceState({}, '', window.location.pathname);

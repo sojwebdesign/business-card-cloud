@@ -164,6 +164,10 @@ window.CardFields = {
         return Object.values(this.definitions).filter((f) => f.optional);
     },
 
+    shouldDisplayHeadshot(cardData) {
+        return !cardData?.hideHeadshot;
+    },
+
     createDefaultCardData() {
         const data = {
             templateId: 'sojern',
@@ -172,6 +176,7 @@ window.CardFields = {
             photoDataUrl: null,
             photoSourceUrl: null,
             photoCrop: null,
+            hideHeadshot: false,
             company: this.COMPANY_NAME,
             enabled: {}
         };
