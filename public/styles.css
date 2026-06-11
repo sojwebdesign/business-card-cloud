@@ -3474,6 +3474,7 @@ a.sojern-card__contact-link:focus-visible {
 
 .help-header {
     text-align: center;
+    margin-top: var(--space-8);
     margin-bottom: var(--space-6);
 }
 
