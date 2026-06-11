@@ -1,0 +1,240 @@
+---
+import { APP_NAME } from '../lib/brand-assets';
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How it works — {APP_NAME}</title>
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#242452">
+    <link rel="icon" type="image/png" href="/business-card/Assets/DigiCard_Favicon_Light.png" media="(prefers-color-scheme: light)">
+    <link rel="icon" type="image/png" href="/business-card/Assets/DigiCard_Favicon_Dark.png" media="(prefers-color-scheme: dark)">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/business-card/styles.css">
+</head>
+<body>
+    <div class="app-container help-page">
+        <header class="header">
+            <a class="logo logo-link" href="/business-card/">
+                <img class="logo-image logo-light" src="/business-card/Assets/DigiCard-Logo_Light.png" alt="Sojern DigiCard" width="300" height="41">
+                <img class="logo-image logo-dark" src="/business-card/Assets/DigiCard-Logo_Dark.png" alt="Sojern DigiCard" width="300" height="41">
+            </a>
+            <nav class="nav">
+                <a href="/business-card/" class="back-link">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    Back to builder
+                </a>
+            </nav>
+        </header>
+
+        <main class="help-main">
+            <header class="help-header">
+                <h1 class="help-title">How it works</h1>
+                <p class="help-intro">Everything you need to create, share, and manage your Sojern DigiCard — from first-time setup to using your QR code at events.</p>
+            </header>
+
+            <nav class="help-toc" aria-label="On this page">
+                <p class="help-toc-label">Jump to</p>
+                <ul class="help-toc-list">
+                    <li><a href="#getting-started">Getting started</a></li>
+                    <li><a href="#two-links">My card vs. contact page</a></li>
+                    <li><a href="#events">Using your card at events</a></li>
+                    <li><a href="#qr-scan">What people see when they scan</a></li>
+                    <li><a href="#sharing">Sharing your contact</a></li>
+                    <li><a href="#editing">Editing your card</a></li>
+                    <li><a href="#deleting">Deleting a card</a></li>
+                    <li><a href="#find-my-card">Find my card</a></li>
+                    <li><a href="#home-screen">Add to Home Screen</a></li>
+                    <li><a href="#help">Need help?</a></li>
+                </ul>
+            </nav>
+
+            <div class="help-faq">
+                <details class="help-faq-item" id="getting-started" open>
+                    <summary>Getting started — create and publish your card</summary>
+                    <div class="help-faq-body">
+                        <ol>
+                            <li>Open the <a href="/business-card/">DigiCard builder</a> on your computer (desktop works best).</li>
+                            <li>Enter your <strong>name</strong>, <strong>job title</strong>, and <strong>work email</strong>. Add an optional headshot if you like.</li>
+                            <li>Choose the <strong>Sojern Branded</strong> template and continue to the editor.</li>
+                            <li>Turn contact fields on or off (phone, LinkedIn, Calendly, address, etc.) and preview your card on the right.</li>
+                            <li>Click <strong>Publish Card</strong> in the Share menu (top right). Your card is saved online and you get two links:
+                                <ul>
+                                    <li><strong>My card</strong> — your personal page with a QR code</li>
+                                    <li><strong>Contact page</strong> — what prospects see when they scan your QR</li>
+                                </ul>
+                            </li>
+                            <li>On your phone, open your <strong>My card</strong> link and add it to your Home Screen (see <a href="#home-screen">Add to Home Screen</a> below).</li>
+                        </ol>
+                        <p class="help-note">Use your real <strong>@sojern.com</strong> email — you'll need inbox access later to request secure edit or delete links.</p>
+                    </div>
+                </details>
+
+                <details class="help-faq-item" id="two-links">
+                    <summary>My card link vs. contact page — what's the difference?</summary>
+                    <div class="help-faq-body">
+                        <p>After you publish, you get two URLs. They look similar but serve different audiences:</p>
+                        <dl class="help-def-list">
+                            <dt>My card (<code>/share</code>)</dt>
+                            <dd>
+                                <strong>For you.</strong> Shows your card plus a large QR code at the top. Use this page on your phone at events — add it to your Home Screen for one-tap access. You can also use <strong>Share Contact</strong> to AirDrop or message your vCard to someone nearby.
+                            </dd>
+                            <dt>Contact page (shorter URL, no <code>/share</code>)</dt>
+                            <dd>
+                                <strong>For prospects.</strong> This is where your QR code points. It shows your card and a <strong>Save to Contacts</strong> button so they can add you to their phone. There is no QR on this page — it's meant to be the destination after a scan.
+                            </dd>
+                        </dl>
+                        <p class="help-note">Your QR code always links to the <strong>contact page</strong>, not your My card page. That way prospects go straight to saving your info.</p>
+                    </div>
+                </details>
+
+                <details class="help-faq-item" id="events">
+                    <summary>Using your card at events</summary>
+                    <div class="help-faq-body">
+                        <ol>
+                            <li>Before the event, publish your card and add <strong>My card</strong> to your phone's Home Screen.</li>
+                            <li>At the event, open the <strong>Sojern DigiCard</strong> icon on your Home Screen — your QR code appears at the top.</li>
+                            <li>Let the other person scan the QR with their phone camera.</li>
+                            <li>They land on your <strong>contact page</strong> and tap <strong>Save to Contacts</strong>.</li>
+                        </ol>
+                        <p>Your QR and contact link stay the same when you update your card — you don't need a new QR after editing job title, phone, or other fields.</p>
+                        <p>If you updated your card's appearance and the Home Screen icon looks stale, remove the old shortcut and add it again (see <a href="#home-screen">Add to Home Screen</a>).</p>
+                    </div>
+                </details>
+
+                <details class="help-faq-item" id="qr-scan">
+                    <summary>What do people see when they scan my QR code?</summary>
+                    <div class="help-faq-body">
+                        <p>Scanning your QR opens your <strong>contact page</strong> — a clean view of your digital business card with:</p>
+                        <ul>
+                            <li>Your name, title, photo, and enabled contact fields</li>
+                            <li>Tappable phone, email, and links (where you've added them)</li>
+                            <li>A prominent <strong>Save to Contacts</strong> button at the top</li>
+                        </ul>
+                        <p>They do <strong>not</strong> see your QR code, edit controls, or internal Sojern tools — just your contact info and a way to save it.</p>
+                    </div>
+                </details>
+
+                <details class="help-faq-item" id="sharing">
+                    <summary>Sharing your contact in other ways</summary>
+                    <div class="help-faq-body">
+                        <h3 class="help-subheading">From your My card page (on your phone)</h3>
+                        <ul>
+                            <li><strong>Share Contact</strong> — sends your vCard via AirDrop or Messages to a nearby iPhone (great for 1:1 at a booth).</li>
+                            <li><strong>QR code</strong> — let anyone scan to open your contact page.</li>
+                        </ul>
+                        <h3 class="help-subheading">From the builder (Share menu)</h3>
+                        <ul>
+                            <li><strong>Copy my card link</strong> — send your personal page URL in email or Slack.</li>
+                            <li><strong>Save QR to Photos</strong> — download the QR image for slides, email signatures, or print.</li>
+                            <li><strong>Download Contact (.vcf)</strong> — save a contact file to attach or import manually.</li>
+                        </ul>
+                        <h3 class="help-subheading">From the contact page (what prospects use)</h3>
+                        <ul>
+                            <li><strong>Save to Contacts</strong> — adds you to their phone's Contacts app (includes photo when you've uploaded one).</li>
+                        </ul>
+                    </div>
+                </details>
+
+                <details class="help-faq-item" id="editing">
+                    <summary>Editing your card after publish</summary>
+                    <div class="help-faq-body">
+                        <p>You don't get a permanent edit URL when you publish — that's intentional for security. To edit:</p>
+                        <ol>
+                            <li>Go to the <a href="/business-card/">DigiCard builder</a> and click <strong>Find my card</strong>.</li>
+                            <li>Enter the email on your card and click <strong>Look up cards</strong>.</li>
+                            <li>Click <strong>Email me an edit link</strong> for the card you want to change.</li>
+                            <li>Open the link in your inbox (expires in 1 hour, single use).</li>
+                            <li>Make your changes in the editor, then click <strong>Update Card</strong>.</li>
+                        </ol>
+                        <p>Your <strong>My card</strong> and <strong>contact page</strong> URLs stay the same after an update — only the content changes.</p>
+                        <p>In the editor sidebar, <strong>Invalidate old edit links</strong> revokes any previously issued edit links if you're concerned about security.</p>
+                        <p class="help-note">If you already have the editor open from a valid session, you can update directly with <strong>Update Card</strong> without requesting a new link.</p>
+                    </div>
+                </details>
+
+                <details class="help-faq-item" id="deleting">
+                    <summary>Deleting a card</summary>
+                    <div class="help-faq-body">
+                        <h3 class="help-subheading">From Find my card (recommended)</h3>
+                        <ol>
+                            <li>Look up your card by email (see <a href="#find-my-card">Find my card</a>).</li>
+                            <li>Click <strong>Email delete confirmation</strong>.</li>
+                            <li>Open the link in your inbox and confirm deletion in the modal.</li>
+                        </ol>
+                        <p>This requires access to the email on the card so someone else can't delete your card without your inbox.</p>
+                        <h3 class="help-subheading">From the editor (while you're editing)</h3>
+                        <p>If you have an active edit session, use <strong>Delete this card</strong> in the editor sidebar. All links and QR codes for that card will stop working immediately.</p>
+                        <p class="help-note">Deletion is permanent. You'll need to publish a new card if you change your mind.</p>
+                    </div>
+                </details>
+
+                <details class="help-faq-item" id="find-my-card">
+                    <summary>Find my card — lookup, links, and duplicate cards</summary>
+                    <div class="help-faq-body">
+                        <p>Use <strong>Find my card</strong> on the builder home page when you:</p>
+                        <ul>
+                            <li>Forgot which card you published</li>
+                            <li>Need your My card or contact page links again</li>
+                            <li>Want a secure edit or delete link emailed to you</li>
+                            <li>Need Home Screen setup steps for an existing card</li>
+                        </ul>
+                        <p>Enter the <strong>work email on your card</strong>, then choose the action you need for each card listed.</p>
+                        <h3 class="help-subheading">Already have a card?</h3>
+                        <p>If you start the builder with an email that's already in the system, DigiCard will warn you and show your existing card(s). You can open <strong>Find my card</strong> to edit the existing one, or choose <strong>Create another card</strong> to publish a second card with a new URL (e.g. <code>your-name-2</code>).</p>
+                    </div>
+                </details>
+
+                <details class="help-faq-item" id="home-screen">
+                    <summary>Add to Home Screen (iPhone &amp; Android)</summary>
+                    <div class="help-faq-body">
+                        <p>Add your <strong>My card</strong> page to your phone's Home Screen so you can open your QR in one tap at events. The shortcut is named <strong>Sojern DigiCard</strong>.</p>
+                        <h3 class="help-subheading">iPhone (Safari required)</h3>
+                        <ol>
+                            <li>Open your <strong>My card</strong> link in <strong>Safari</strong>.</li>
+                            <li>Tap the Share button → <strong>Add to Home Screen</strong>.</li>
+                            <li>Confirm the name and tap <strong>Add</strong>.</li>
+                        </ol>
+                        <h3 class="help-subheading">Android (Chrome)</h3>
+                        <ol>
+                            <li>Open your <strong>My card</strong> link in <strong>Chrome</strong>.</li>
+                            <li>Tap the menu (⋮) → <strong>Add to Home screen</strong> or <strong>Install app</strong>.</li>
+                        </ol>
+                        <p>Step-by-step instructions are also available from the builder home page (<strong>Home Screen Setup Guide</strong>) and inside the publish modal after you publish.</p>
+                    </div>
+                </details>
+
+                <details class="help-faq-item" id="help">
+                    <summary>Need help?</summary>
+                    <div class="help-faq-body">
+                        <p>If something isn't working — emails not arriving, wrong links, spam cards, or access issues — reach out to Meaghan:</p>
+                        <ul>
+                            <li>Email: <a href="mailto:meaghan.sandtorv@sojern.com">meaghan.sandtorv@sojern.com</a></li>
+                            <li>Slack: message Meaghan Sandtorv</li>
+                        </ul>
+                        <p>She can help with:</p>
+                        <ul>
+                            <li>Removing spam or test cards from the system</li>
+                            <li>Troubleshooting email delivery for edit/delete links</li>
+                            <li>Questions about Sojern branding or rollout</li>
+                        </ul>
+                        <p>You can also return to the <a href="https://sojern.design">Sojern Design Hub</a> for other design resources.</p>
+                        <p class="help-cta-wrap">
+                            <a href="/business-card/" class="btn btn-primary">Open DigiCard builder</a>
+                        </p>
+                    </div>
+                </details>
+            </div>
+        </main>
+    </div>
+
+    <script is:inline src="/business-card/brand.js"></script>
+    <script is:inline src="/business-card/how-it-works.js"></script>
+</body>
+</html>

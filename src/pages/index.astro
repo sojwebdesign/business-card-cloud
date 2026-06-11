@@ -99,6 +99,9 @@
                     <div class="home-header">
                         <h1 class="home-title">Build your digital business card</h1>
                         <p class="home-subtitle">Enter your basics, choose a template, then customize which fields appear on your card.</p>
+                        <p class="home-cta-wrap">
+                            <a href="/business-card/how-it-works" class="btn btn-secondary">How it works</a>
+                        </p>
                         <p class="home-guide-link-wrap">
                             <button type="button" class="home-guide-link" id="homeScreenGuideLink">Home Screen Setup Guide</button>
                         </p>
@@ -276,6 +279,25 @@
                 <button type="submit" class="btn btn-primary">Look up cards</button>
             </form>
             <div class="recover-results hidden" id="recoverResults"></div>
+        </div>
+    </div>
+
+    <!-- Existing card warning -->
+    <div class="modal-overlay hidden" id="duplicateEmailModal">
+        <div class="modal-card modal-card--wide modal-card--scroll">
+            <button type="button" class="modal-close" id="closeDuplicateEmailModal" aria-label="Close">&times;</button>
+            <h2 class="modal-title">You already have a card</h2>
+            <p class="modal-text">This email already has published card(s). Use <strong>Find my card</strong> to edit an existing one, or create another card with a new URL.</p>
+            <div class="duplicate-email-list" id="duplicateEmailList"></div>
+            <div class="duplicate-email-proposed">
+                <p class="sub-label">New card URL if you continue</p>
+                <p class="duplicate-email-slug"><code id="duplicateProposedSlug"></code></p>
+                <p class="helper-text" id="duplicateProposedUrl"></p>
+            </div>
+            <div class="publish-modal-actions duplicate-email-actions">
+                <button type="button" class="btn btn-secondary" id="duplicateFindCardBtn">Find my card</button>
+                <button type="button" class="btn btn-primary" id="duplicateCreateAnotherBtn">Create another card</button>
+            </div>
         </div>
     </div>
 

@@ -2138,6 +2138,14 @@ body.dark-mode .effect-option-badge {
     font-size: 1rem;
 }
 
+.home-cta-wrap {
+    margin: var(--space-4) 0 0;
+}
+
+.home-cta-wrap .btn {
+    min-width: 10rem;
+}
+
 .contact-form {
     background: var(--bg-white);
     border: 1px solid var(--border-light);
@@ -3061,6 +3069,7 @@ a.sojern-card__contact-link:focus-visible {
     display: flex;
     flex-direction: column;
     gap: var(--space-1);
+    margin-top: var(--space-4);
     margin-bottom: var(--space-3);
     font-size: 0.8125rem;
 }
@@ -3297,6 +3306,50 @@ a.sojern-card__contact-link:focus-visible {
     }
 }
 
+.duplicate-email-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin: var(--space-4) 0;
+}
+
+.duplicate-email-item {
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md, 8px);
+    background: var(--surface-muted, #f5f5f8);
+}
+
+.duplicate-email-item h3 {
+    margin: 0 0 var(--space-1);
+    font-size: 1rem;
+}
+
+.duplicate-email-item p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.duplicate-email-item code {
+    font-size: 0.8125rem;
+}
+
+.duplicate-email-proposed {
+    margin-bottom: var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-md, 8px);
+    border: 1px dashed var(--border-light);
+}
+
+.duplicate-email-slug {
+    margin: var(--space-1) 0;
+}
+
+.duplicate-email-actions {
+    justify-content: flex-end;
+}
+
 .admin-page .admin-main {
     max-width: 1100px;
     margin: 0 auto;
@@ -3375,5 +3428,210 @@ a.sojern-card__contact-link:focus-visible {
 
 #loadMoreCardsBtn {
     margin-top: var(--space-4);
+}
+
+/* ─── How it works / help page ─── */
+
+.logo-link {
+    display: inline-flex;
+    text-decoration: none;
+}
+
+.help-page .help-main {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: var(--space-6) var(--space-4) var(--space-10);
+}
+
+.help-header {
+    text-align: center;
+    margin-bottom: var(--space-6);
+}
+
+.help-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 var(--space-2);
+}
+
+.help-intro {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    line-height: 1.55;
+    margin: 0;
+}
+
+.help-toc {
+    margin-bottom: var(--space-6);
+    padding: var(--space-4);
+    background: var(--bg-white);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+.help-toc-label {
+    margin: 0 0 var(--space-2);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.help-toc-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-4);
+}
+
+.help-toc-list a {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--brand-primary);
+    text-decoration: none;
+}
+
+.help-toc-list a:hover,
+.help-toc-list a:focus-visible {
+    text-decoration: underline;
+}
+
+.help-faq {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.help-faq-item {
+    background: var(--bg-white);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+.help-faq-item summary {
+    padding: var(--space-4) var(--space-5);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+}
+
+.help-faq-item summary::-webkit-details-marker {
+    display: none;
+}
+
+.help-faq-item summary::after {
+    content: '+';
+    flex-shrink: 0;
+    font-size: 1.25rem;
+    font-weight: 400;
+    color: var(--text-muted);
+    line-height: 1;
+}
+
+.help-faq-item[open] summary::after {
+    content: '−';
+}
+
+.help-faq-item summary:hover {
+    background: var(--surface-muted, #f5f5f8);
+}
+
+.help-faq-body {
+    padding: 0 var(--space-5) var(--space-5);
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+}
+
+.help-faq-body > :first-child {
+    margin-top: 0;
+}
+
+.help-faq-body h3.help-subheading {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: var(--space-4) 0 var(--space-2);
+}
+
+.help-faq-body h3.help-subheading:first-child {
+    margin-top: 0;
+}
+
+.help-faq-body ul,
+.help-faq-body ol {
+    margin: var(--space-2) 0;
+    padding-left: 1.25rem;
+}
+
+.help-faq-body li + li {
+    margin-top: var(--space-1);
+}
+
+.help-faq-body a {
+    color: var(--brand-primary);
+    font-weight: 500;
+}
+
+.help-faq-body code {
+    font-size: 0.8125rem;
+    padding: 0.1em 0.35em;
+    border-radius: 4px;
+    background: var(--surface-muted, #f5f5f8);
+    color: var(--text-primary);
+}
+
+.help-def-list {
+    margin: var(--space-3) 0;
+}
+
+.help-def-list dt {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-top: var(--space-3);
+}
+
+.help-def-list dt:first-child {
+    margin-top: 0;
+}
+
+.help-def-list dd {
+    margin: var(--space-1) 0 0;
+}
+
+.help-note {
+    margin: var(--space-4) 0 0;
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-md, 8px);
+    background: var(--surface-muted, #f5f5f8);
+    font-size: 0.875rem;
+}
+
+.help-cta-wrap {
+    margin-top: var(--space-5);
+}
+
+@media (max-width: 640px) {
+    .help-faq-item summary {
+        padding: var(--space-3) var(--space-4);
+        font-size: 0.9375rem;
+    }
+
+    .help-faq-body {
+        padding: 0 var(--space-4) var(--space-4);
+    }
 }
 

@@ -75,6 +75,23 @@ async function removeFromEmailIndex(kv: KVNamespace, email: string, slug: string
     }
 }
 
+export async function previewNewCardSlug(
+    locals: App.Locals,
+    fullName: string,
+    excludeSlug?: string
+): Promise<string> {
+    const kv = getCardsKV(locals);
+    return resolveUniqueSlug(fullName || 'card', async (candidate) => {
+        if (excludeSlug && candidate === excludeSlug) {
+            return false;
+        }
+        if (isReservedSlug(candidate)) {
+            return false;
+        }
+        return !(await kv.get(kvKey(candidate)));
+    });
+}
+
 export async function findCardsByEmail(locals: App.Locals, email: string): Promise<PublishedCard[]> {
     const kv = getCardsKV(locals);
     const normalized = email.toLowerCase().trim();

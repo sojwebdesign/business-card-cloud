@@ -13,6 +13,9 @@ let publishState = {
     editUrl: null,
     published: false
 };
+let duplicateCreateConfirmed = false;
+let duplicateConfirmedForEmail = null;
+let pendingBasicsAfterDuplicate = null;
 
 const homeSection = document.getElementById('homeSection');
 const templateSelectionSection = document.getElementById('templateSelectionSection');
@@ -61,6 +64,7 @@ function init() {
     bindPublishModal();
     bindRecoverModal();
     bindDeleteConfirmModal();
+    bindDuplicateEmailModal();
     loadEditFromUrl();
     loadDeleteFromUrl();
 }
@@ -125,7 +129,7 @@ function bindPublishModal() {
 }
 
 function bindBasicsForm() {
-    basicsForm.addEventListener('submit', (e) => {
+    basicsForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const fullName = document.getElementById('fullName').value.trim();
         const jobTitle = document.getElementById('jobTitle').value.trim();
@@ -138,9 +142,32 @@ function bindBasicsForm() {
         cardData.fullName = fullName;
         cardData.jobTitle = jobTitle;
         cardData.email.value = email;
-
         templateUserName.textContent = fullName;
-        showTemplateSelection();
+
+        const submitBtn = basicsForm.querySelector('button[type="submit"]');
+        if (submitBtn) {
+            submitBtn.disabled = true;
+        }
+
+        if (duplicateConfirmedForEmail !== email) {
+            duplicateCreateConfirmed = false;
+            duplicateConfirmedForEmail = null;
+        }
+
+        try {
+            const duplicateCheck = await checkEmailForDuplicates(email, fullName);
+            if (duplicateCheck?.hasExisting && !duplicateCreateConfirmed) {
+                showDuplicateEmailModal(duplicateCheck, email);
+                return;
+            }
+            showTemplateSelection();
+        } catch (error) {
+            showToast(error.message || 'Could not verify email', 'error');
+        } finally {
+            if (submitBtn) {
+                submitBtn.disabled = false;
+            }
+        }
     });
 }
 
@@ -485,6 +512,9 @@ function clearAppState() {
     cardData = CardFields.createDefaultCardData();
     currentTemplate = 'sojern';
     publishState = { slug: null, editKey: null, shareUrl: null, contactUrl: null, editUrl: null, published: false };
+    duplicateCreateConfirmed = false;
+    duplicateConfirmedForEmail = null;
+    pendingBasicsAfterDuplicate = null;
     updateShareMenuState();
     basicsForm.reset();
     photoPreview.classList.add('hidden');
@@ -625,6 +655,19 @@ async function publishCard() {
     publishBtn.textContent = publishState.published ? 'Updating…' : 'Publishing…';
 
     try {
+        const publishEmail = cardData.email?.value?.trim();
+        const emailAlreadyConfirmed = duplicateCreateConfirmed && duplicateConfirmedForEmail === publishEmail;
+        if (!publishState.published && !emailAlreadyConfirmed) {
+            const duplicateCheck = await checkEmailForDuplicates(
+                publishEmail,
+                cardData.fullName?.trim()
+            );
+            if (duplicateCheck?.hasExisting) {
+                showDuplicateEmailModal(duplicateCheck, cardData.email?.value?.trim(), { onCreateAnother: publishCard });
+                return;
+            }
+        }
+
         const payload = await prepareCardDataForPublish();
         const response = await fetch('/business-card/api/cards/publish', {
             method: 'POST',
@@ -760,6 +803,83 @@ async function loadEditFromUrl() {
         console.error(error);
         showToast(error.message || 'Could not load card for editing', 'error');
     }
+}
+
+async function checkEmailForDuplicates(email, fullName) {
+    if (!email || !fullName) return null;
+
+    const response = await fetch('/business-card/api/cards/check-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            email,
+            fullName,
+            excludeSlug: publishState.slug || undefined
+        })
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || 'Could not check email');
+    return result;
+}
+
+function showDuplicateEmailModal(check, email, options = {}) {
+    const modal = document.getElementById('duplicateEmailModal');
+    const listEl = document.getElementById('duplicateEmailList');
+    const slugEl = document.getElementById('duplicateProposedSlug');
+    const urlEl = document.getElementById('duplicateProposedUrl');
+
+    if (listEl) {
+        listEl.innerHTML = check.cards.map((card) => `
+            <div class="duplicate-email-item">
+                <h3>${escapeHtml(card.fullName)}</h3>
+                <p>${escapeHtml(card.jobTitle)}</p>
+                <p><code>${escapeHtml(card.slug)}</code> · Last edited ${escapeHtml(formatRecoverTimestamp(card.updatedAt))}</p>
+            </div>`).join('');
+    }
+
+    if (slugEl) slugEl.textContent = check.proposedSlug;
+    if (urlEl) urlEl.textContent = check.proposedContactUrl || '';
+
+    pendingBasicsAfterDuplicate = {
+        email,
+        onCreateAnother: options.onCreateAnother || null
+    };
+    modal?.classList.remove('hidden');
+}
+
+function bindDuplicateEmailModal() {
+    const modal = document.getElementById('duplicateEmailModal');
+    const close = () => {
+        pendingBasicsAfterDuplicate = null;
+        modal?.classList.add('hidden');
+    };
+
+    document.getElementById('closeDuplicateEmailModal')?.addEventListener('click', close);
+    modal?.addEventListener('click', (event) => {
+        if (event.target === modal) close();
+    });
+
+    document.getElementById('duplicateFindCardBtn')?.addEventListener('click', () => {
+        const email = pendingBasicsAfterDuplicate?.email || cardData.email?.value?.trim();
+        close();
+        resetRecoverModal();
+        document.getElementById('recoverModal')?.classList.remove('hidden');
+        if (email) document.getElementById('recoverEmail').value = email;
+    });
+
+    document.getElementById('duplicateCreateAnotherBtn')?.addEventListener('click', async () => {
+        const pending = pendingBasicsAfterDuplicate;
+        duplicateCreateConfirmed = true;
+        duplicateConfirmedForEmail = pending?.email || cardData.email?.value?.trim() || null;
+        close();
+
+        if (typeof pending?.onCreateAnother === 'function') {
+            await pending.onCreateAnother();
+            return;
+        }
+
+        showTemplateSelection();
+    });
 }
 
 async function requestEditLink(email, slug) {
