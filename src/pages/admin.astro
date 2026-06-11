@@ -8,6 +8,10 @@ import { APP_NAME } from '../lib/brand-assets';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{APP_NAME} Admin</title>
     <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#242452">
+    <link rel="icon" type="image/png" href="/business-card/Assets/DigiCard_Favicon_Light.png" media="(prefers-color-scheme: light)">
+    <link rel="icon" type="image/png" href="/business-card/Assets/DigiCard_Favicon_Dark.png" media="(prefers-color-scheme: dark)">
+    <link rel="icon" type="image/png" href="/business-card/Assets/DigiCard_Favicon_Light.png" data-brand-favicon>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -55,6 +59,7 @@ import { APP_NAME } from '../lib/brand-assets';
     </div>
 
     <div class="toast-container" id="toastContainer"></div>
+    <script is:inline src="/business-card/brand.js"></script>
     <script is:inline src="/business-card/admin.js"></script>
 </body>
 </html>
