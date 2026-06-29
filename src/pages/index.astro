@@ -19,10 +19,12 @@
     <link rel="icon" type="image/png" href="/business-card/Assets/DigiCard_Favicon_Light.png" data-brand-favicon>
     <link rel="apple-touch-icon" href="/business-card/Assets/DigiCard_Shortcut-Icon-180.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/business-card/Assets/DigiCard_Shortcut-Icon-180.png">
+    <link rel="preload" href="/business-card/styles.css" as="style">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/business-card/styles.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap"></noscript>
 </head>
 <body>
     <div class="app-container">
@@ -324,12 +326,9 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <script is:inline src="/business-card/brand.js"></script>
-    <script is:inline src="/business-card/vendor/qrcode.min.js"></script>
     <script is:inline src="/business-card/card-fields.js"></script>
     <script is:inline src="/business-card/card-icons.js"></script>
     <script is:inline src="/business-card/card-templates.js"></script>
-    <script is:inline src="/business-card/photo-crop.js"></script>
-    <script is:inline src="/business-card/home-screen-guide.js"></script>
     <script is:inline src="/business-card/app.js"></script>
 </body>
 </html>

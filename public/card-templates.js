@@ -22,7 +22,7 @@ window.CardTemplates = {
             companyUrlDefault: 'www.rategain.com',
             className: 'card-template-rategain',
             thumbClass: 'template-thumb-rategain',
-            headerImage: '/business-card/Assets/card-header-rategain.svg',
+            headerImage: '/business-card/Assets/card-header-rategain.png',
             headerPlaceholder: '/business-card/Assets/card-header-placeholder.svg',
             headerFallback: 'linear-gradient(135deg, #4a0d99 0%, #8012ff 100%)'
         }
@@ -124,6 +124,10 @@ window.CardTemplates = {
         return null;
     },
 
+    getPhotoSrc(cardData) {
+        return cardData?.photoDataUrl || cardData?.photoUrl || null;
+    },
+
     render(container, templateId, cardData) {
         const template = this.getTemplate(templateId);
         const fields = window.CardFields;
@@ -158,11 +162,14 @@ window.CardTemplates = {
             const photoWrap = document.createElement('div');
             photoWrap.className = 'sojern-card__photo-wrap';
 
-            if (cardData.photoDataUrl) {
+            const photoSrc = this.getPhotoSrc(cardData);
+            if (photoSrc) {
                 const img = document.createElement('img');
                 img.className = 'sojern-card__photo';
-                img.src = cardData.photoDataUrl;
+                img.src = photoSrc;
                 img.alt = '';
+                img.loading = 'lazy';
+                img.decoding = 'async';
                 photoWrap.appendChild(img);
             } else {
                 const placeholder = document.createElement('div');

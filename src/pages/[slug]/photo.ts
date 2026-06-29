@@ -28,7 +28,7 @@ export const GET: APIRoute = async ({ params, locals }) => {
         status: 200,
         headers: {
             'Content-Type': `image/${type === 'jpg' ? 'jpeg' : type}`,
-            'Cache-Control': 'no-cache, no-store, must-revalidate'
+            'Cache-Control': 'public, max-age=86400, stale-while-revalidate=604800'
         }
     });
 };

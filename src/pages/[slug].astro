@@ -1,6 +1,7 @@
 ---
 import { getCardBySlug } from '../lib/cards-store';
 import { isReservedSlug } from '../lib/reserved-slugs';
+import { getTemplateHeaderImage, toPublicCardView } from '../lib/public-card-data';
 
 export const prerender = false;
 
@@ -23,6 +24,11 @@ if (!card) {
 const vcfUrl = `/business-card/${slug}.vcf`;
 const templateId = card.templateId;
 const fullName = card.cardData.fullName;
+const publicCardData = toPublicCardView(card.cardData, slug, card.updatedAt);
+const headerImage = getTemplateHeaderImage(templateId);
+const fontHref = templateId === 'rategain'
+    ? 'https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Manrope:wght@400;600;700&display=swap'
+    : 'https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap';
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -34,10 +40,13 @@ const fullName = card.cardData.fullName;
     <meta name="format-detection" content="telephone=no, address=no">
     <link rel="icon" type="image/png" href="/business-card/Assets/DigiCard_Favicon_Light.png" media="(prefers-color-scheme: light)">
     <link rel="icon" type="image/png" href="/business-card/Assets/DigiCard_Favicon_Dark.png" media="(prefers-color-scheme: dark)">
+    <link rel="preload" href="/business-card/styles.css" as="style">
+    <link rel="preload" href={headerImage} as="image">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/business-card/styles.css">
+    <link rel="stylesheet" href={fontHref} media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href={fontHref}></noscript>
 </head>
 <body class={`public-card-page contact-card-page${templateId === 'rategain' ? ' public-card-page--rategain' : ''}`}>
     <main class="public-card-main">
@@ -55,7 +64,7 @@ const fullName = card.cardData.fullName;
     <script is:inline src="/business-card/card-icons.js"></script>
     <script is:inline src="/business-card/card-templates.js"></script>
     <script is:inline src="/business-card/contact-page.js"></script>
-    <script is:inline define:vars={{ cardData: card.cardData, templateId, vcfUrl, fullName }}>
+    <script is:inline define:vars={{ cardData: publicCardData, templateId, vcfUrl, fullName }}>
         const mount = document.getElementById('cardPreviewMount');
         if (mount && window.CardTemplates) {
             window.CardTemplates.render(mount, templateId, cardData);

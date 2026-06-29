@@ -3,6 +3,7 @@ import { getCardBySlug, buildCardUrls } from '../../lib/cards-store';
 import { APP_NAME, APPLE_TOUCH_ICON, FAVICON_DARK, FAVICON_LIGHT } from '../../lib/brand-assets';
 import { getPublicOrigin } from '../../lib/site-url';
 import { isReservedSlug } from '../../lib/reserved-slugs';
+import { getTemplateHeaderImage, toPublicCardView } from '../../lib/public-card-data';
 
 export const prerender = false;
 
@@ -28,6 +29,11 @@ const templateId = card.templateId;
 const contactUrl = urls.contactUrl;
 const vcfUrl = urls.vcfUrl;
 const fullName = card.cardData.fullName;
+const publicCardData = toPublicCardView(card.cardData, slug, card.updatedAt);
+const headerImage = getTemplateHeaderImage(templateId);
+const fontHref = templateId === 'rategain'
+    ? 'https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Manrope:wght@400;600;700&display=swap'
+    : 'https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap';
 const manifestUrl = `/business-card/${slug}/manifest.webmanifest`;
 ---
 <!DOCTYPE html>
@@ -45,10 +51,13 @@ const manifestUrl = `/business-card/${slug}/manifest.webmanifest`;
     <link rel="icon" type="image/png" href={FAVICON_DARK} media="(prefers-color-scheme: dark)">
     <link rel="apple-touch-icon" href={APPLE_TOUCH_ICON}>
     <link rel="apple-touch-icon" sizes="180x180" href={APPLE_TOUCH_ICON}>
+    <link rel="preload" href="/business-card/styles.css" as="style">
+    <link rel="preload" href={headerImage} as="image">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/business-card/styles.css">
+    <link rel="stylesheet" href={fontHref} media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href={fontHref}></noscript>
 </head>
 <body class={`public-card-page share-card-page${templateId === 'rategain' ? ' public-card-page--rategain' : ''}`}>
     <main class="public-card-main">
@@ -79,26 +88,31 @@ const manifestUrl = `/business-card/${slug}/manifest.webmanifest`;
         </div>
     </div>
 
-    <script is:inline src="/business-card/vendor/qrcode.min.js"></script>
     <script is:inline src="/business-card/card-fields.js"></script>
     <script is:inline src="/business-card/card-icons.js"></script>
     <script is:inline src="/business-card/card-templates.js"></script>
     <script is:inline src="/business-card/contact-page.js"></script>
-    <script is:inline src="/business-card/home-screen-guide.js"></script>
-    <script is:inline define:vars={{ cardData: card.cardData, templateId, contactUrl, vcfUrl, fullName, shareUrl: urls.shareUrl }}>
+    <script is:inline src="/business-card/home-screen-guide.js" defer></script>
+    <script is:inline define:vars={{ cardData: publicCardData, templateId, contactUrl, vcfUrl, fullName, shareUrl: urls.shareUrl }}>
         const mount = document.getElementById('cardPreviewMount');
         if (mount && window.CardTemplates) {
             window.CardTemplates.render(mount, templateId, cardData);
         }
 
-        const canvas = document.getElementById('shareQrCanvas');
-        if (canvas && typeof QRCode !== 'undefined') {
-            QRCode.toCanvas(canvas, contactUrl, {
-                width: 220,
-                margin: 1,
-                color: { dark: '#242452', light: '#ffffff' }
-            });
-        }
+        (async () => {
+            const canvas = document.getElementById('shareQrCanvas');
+            if (!canvas) return;
+            try {
+                await ensureQRCode();
+                QRCode.toCanvas(canvas, contactUrl, {
+                    width: 220,
+                    margin: 1,
+                    color: { dark: '#242452', light: '#ffffff' }
+                });
+            } catch (error) {
+                console.warn('QR generation failed', error);
+            }
+        })();
 
         const homeScreenModal = document.getElementById('shareHomeScreenModal');
         const openHomeScreenGuide = () => {

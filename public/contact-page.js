@@ -2,6 +2,25 @@
  * Contact sharing helpers for contact and share pages.
  */
 
+const scriptPromises = {};
+
+function loadScript(src) {
+    if (scriptPromises[src]) return scriptPromises[src];
+    scriptPromises[src] = new Promise((resolve, reject) => {
+        const el = document.createElement('script');
+        el.src = src;
+        el.onload = () => resolve();
+        el.onerror = () => reject(new Error(`Failed to load ${src}`));
+        document.head.appendChild(el);
+    });
+    return scriptPromises[src];
+}
+
+async function ensureQRCode() {
+    if (typeof QRCode !== 'undefined') return;
+    await loadScript('/business-card/vendor/qrcode.min.js');
+}
+
 async function fetchVCardFile(vcfUrl, fullName) {
     const response = await fetch(vcfUrl, { cache: 'no-store' });
     if (!response.ok) throw new Error('Could not load contact file');

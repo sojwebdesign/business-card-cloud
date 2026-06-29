@@ -51,6 +51,35 @@ const CARD_PUBLIC_ORIGIN = (
     || 'https://sojern.design'
 ).replace(/\/$/, '');
 
+const scriptPromises = {};
+
+function loadScript(src) {
+    if (scriptPromises[src]) return scriptPromises[src];
+    scriptPromises[src] = new Promise((resolve, reject) => {
+        const el = document.createElement('script');
+        el.src = src;
+        el.onload = () => resolve();
+        el.onerror = () => reject(new Error(`Failed to load ${src}`));
+        document.head.appendChild(el);
+    });
+    return scriptPromises[src];
+}
+
+function ensureQRCode() {
+    if (typeof QRCode !== 'undefined') return Promise.resolve();
+    return loadScript('/business-card/vendor/qrcode.min.js');
+}
+
+function ensurePhotoCrop() {
+    if (window.PhotoCrop) return Promise.resolve();
+    return loadScript('/business-card/photo-crop.js');
+}
+
+function ensureHomeScreenGuide() {
+    if (window.HomeScreenGuide) return Promise.resolve();
+    return loadScript('/business-card/home-screen-guide.js');
+}
+
 init();
 
 function init() {
@@ -278,7 +307,14 @@ function readPhotoFile(file, callback) {
     reader.readAsDataURL(file);
 }
 
-function openPhotoCrop(sourceUrl, callback) {
+async function openPhotoCrop(sourceUrl, callback) {
+    try {
+        await ensurePhotoCrop();
+    } catch (error) {
+        console.error(error);
+        showToast('Could not load photo editor', 'error');
+        return;
+    }
     cardData.photoSourceUrl = sourceUrl;
     PhotoCrop.open(sourceUrl, (result) => {
         cardData.photoDataUrl = result.dataUrl;
@@ -696,26 +732,28 @@ function getContactUrl() {
 
 function generateQR() {
     if (!qrCanvas) return;
-    if (typeof QRCode === 'undefined') {
-        console.warn('QRCode library not loaded');
-        return;
-    }
-    const url = getContactUrl();
-    QRCode.toCanvas(
-        qrCanvas,
-        url,
-        {
-            width: 140,
-            margin: 1,
-            color: { dark: '#242452', light: '#ffffff' }
-        },
-        (err) => {
-            if (err) {
-                console.warn('QR generation failed', err);
-                showToast('Could not generate QR code', 'error');
-            }
-        }
-    );
+    ensureQRCode()
+        .then(() => {
+            const url = getContactUrl();
+            QRCode.toCanvas(
+                qrCanvas,
+                url,
+                {
+                    width: 140,
+                    margin: 1,
+                    color: { dark: '#242452', light: '#ffffff' }
+                },
+                (err) => {
+                    if (err) {
+                        console.warn('QR generation failed', err);
+                        showToast('Could not generate QR code', 'error');
+                    }
+                }
+            );
+        })
+        .catch((error) => {
+            console.warn('QRCode library not loaded', error);
+        });
 }
 
 function bindShareActions() {
@@ -833,14 +871,24 @@ function showPublishModal(updated) {
 }
 
 function openHomeScreenGuideModal(shareUrl, options = {}) {
-    HomeScreenGuide.mount(document.getElementById('homeScreenGuideModalMount'), { shareUrl });
-    addToHomeModal?.classList.remove('hidden');
-    addToHomeModal?.classList.toggle('modal-overlay--stacked', Boolean(options.stack));
+    ensureHomeScreenGuide()
+        .then(() => {
+            HomeScreenGuide.mount(document.getElementById('homeScreenGuideModalMount'), { shareUrl });
+            addToHomeModal?.classList.remove('hidden');
+            addToHomeModal?.classList.toggle('modal-overlay--stacked', Boolean(options.stack));
+        })
+        .catch((error) => {
+            console.error(error);
+            showToast('Could not load Home Screen guide', 'error');
+        });
 }
 
 function refreshHomeScreenGuides(shareUrl) {
     const publishMount = document.getElementById('homeScreenGuidePublishMount');
-    if (publishMount) HomeScreenGuide.mount(publishMount, { shareUrl });
+    if (!publishMount) return;
+    ensureHomeScreenGuide()
+        .then(() => HomeScreenGuide.mount(publishMount, { shareUrl }))
+        .catch((error) => console.warn('Home Screen guide not loaded', error));
 }
 
 function updateShareMenuState() {

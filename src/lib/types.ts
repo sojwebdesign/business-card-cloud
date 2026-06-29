@@ -14,6 +14,7 @@ export interface CardData {
     fullName: string;
     jobTitle: string;
     photoDataUrl: string | null;
+    photoUrl?: string | null;
     photoSourceUrl?: string | null;
     photoCrop?: unknown;
     hideHeadshot?: boolean;
