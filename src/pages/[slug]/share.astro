@@ -107,7 +107,10 @@ const manifestUrl = `/business-card/${slug}/manifest.webmanifest`;
                 QRCode.toCanvas(canvas, contactUrl, {
                     width: 220,
                     margin: 1,
-                    color: { dark: '#242452', light: '#ffffff' }
+                    color: {
+                        dark: templateId === 'rategain' ? '#000000' : '#242452',
+                        light: '#ffffff'
+                    }
                 });
             } catch (error) {
                 console.warn('QR generation failed', error);
