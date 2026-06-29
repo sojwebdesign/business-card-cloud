@@ -270,6 +270,66 @@ body.editor-open .editor-layout {
     display: flex;
     align-items: center;
     gap: var(--space-2);
+    position: relative;
+}
+
+.nav-menu-toggle {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    background: var(--bg-white);
+    color: var(--text-primary);
+    cursor: pointer;
+}
+
+.nav-menu-toggle:hover {
+    background: var(--bg-hover);
+}
+
+.nav-menu-panel {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.mobile-editor-gate-card {
+    max-width: 420px;
+    text-align: center;
+}
+
+.mobile-editor-gate-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
+    margin-top: var(--space-2);
+}
+
+.mobile-editor-gate-link {
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: var(--font-sans);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--brand-primary);
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.mobile-editor-gate-link:hover,
+.mobile-editor-gate-link:focus-visible {
+    color: var(--brand-primary-dark, #c44f32);
+}
+
+.mobile-editor-gate-link:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
 /* Theme Toggle */
@@ -2060,6 +2120,69 @@ body.dark-mode .effect-option-badge {
 /* ═══════════════════════════════════════════════════════════════════════════
    Responsive
    ═══════════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+    .header {
+        padding: var(--space-3) var(--space-4);
+    }
+
+    .logo-image {
+        height: 28px;
+    }
+
+    .nav-menu-toggle {
+        display: inline-flex;
+    }
+
+    .nav-menu-panel {
+        display: none;
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+        flex-direction: column;
+        align-items: stretch;
+        min-width: 280px;
+        max-width: min(320px, calc(100vw - 32px));
+        background: var(--bg-white);
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-lg);
+        padding: var(--space-3);
+        gap: var(--space-2);
+        z-index: 200;
+    }
+
+    .nav.open .nav-menu-panel {
+        display: flex;
+    }
+
+    .nav-menu-panel .btn,
+    .nav-menu-panel .back-link {
+        width: 100%;
+        justify-content: center;
+        margin-right: 0;
+    }
+
+    .nav-menu-panel .download-dropdown {
+        width: 100%;
+    }
+
+    .nav-menu-panel .download-dropdown .btn {
+        width: 100%;
+    }
+
+    .nav-menu-panel .download-menu {
+        position: static;
+        width: 100%;
+        min-width: 0;
+        margin-top: var(--space-2);
+        box-shadow: none;
+    }
+
+    .nav-menu-panel .theme-toggle {
+        align-self: center;
+    }
+}
 
 @media (max-width: 900px) {
     .editor-layout {

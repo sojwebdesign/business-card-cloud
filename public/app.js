@@ -3,6 +3,9 @@
  * Flow: basics → template → editor (field customization + preview)
  */
 
+const MOBILE_EDITOR_ACK_KEY = 'digicard-mobile-editor-ack';
+const MOBILE_EDITOR_MQ = window.matchMedia('(max-width: 768px)');
+
 let cardData = CardFields.createDefaultCardData();
 let currentTemplate = 'sojern';
 let publishState = {
@@ -40,6 +43,8 @@ const qrHint = document.getElementById('qrHint');
 const copyPublicLinkBtn = document.getElementById('copyPublicLinkBtn');
 const saveQrBtn = document.getElementById('saveQrBtn');
 const addToHomeBtn = document.getElementById('addToHomeBtn');
+const mobileEditorGate = document.getElementById('mobileEditorGate');
+const mainNav = document.getElementById('mainNav');
 
 const CARD_PUBLIC_ORIGIN = (
     document.querySelector('meta[name="card-public-origin"]')?.content
@@ -60,6 +65,8 @@ function init() {
     bindRecoverModal();
     bindDeleteConfirmModal();
     bindDuplicateEmailModal();
+    bindNavMenu();
+    bindMobileEditorGate();
     loadEditFromUrl();
     loadDeleteFromUrl();
 }
@@ -88,12 +95,97 @@ function bindTheme() {
     });
 }
 
+function bindNavMenu() {
+    const toggle = document.getElementById('navMenuToggle');
+    const panel = document.getElementById('navMenuPanel');
+
+    toggle?.addEventListener('click', (event) => {
+        event.stopPropagation();
+        const isOpen = mainNav?.classList.toggle('open');
+        toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
+
+    panel?.addEventListener('click', (event) => event.stopPropagation());
+
+    document.addEventListener('click', () => closeNavMenu());
+}
+
+function closeNavMenu() {
+    const toggle = document.getElementById('navMenuToggle');
+    mainNav?.classList.remove('open');
+    toggle?.setAttribute('aria-expanded', 'false');
+}
+
+function isMobileView() {
+    return MOBILE_EDITOR_MQ.matches;
+}
+
+function shouldShowMobileEditorGate() {
+    return isMobileView() && !sessionStorage.getItem(MOBILE_EDITOR_ACK_KEY);
+}
+
+function bindMobileEditorGate() {
+    document.getElementById('mobileEditorProceedBtn')?.addEventListener('click', () => {
+        sessionStorage.setItem(MOBILE_EDITOR_ACK_KEY, '1');
+        hideMobileEditorGate();
+        enterEditor();
+    });
+
+    document.getElementById('mobileEditorEmailLinkBtn')?.addEventListener('click', emailDesktopEditLinkFromGate);
+}
+
+function showMobileEditorGate() {
+    mobileEditorGate?.classList.remove('hidden');
+}
+
+function hideMobileEditorGate() {
+    mobileEditorGate?.classList.add('hidden');
+}
+
+async function emailDesktopEditLinkFromGate() {
+    const email = cardData.email?.value?.trim();
+    const btn = document.getElementById('mobileEditorEmailLinkBtn');
+
+    if (!email) {
+        showToast('Enter your email in the basics step first, or use Find my card.', 'error');
+        return;
+    }
+    if (!CardFields.isAllowedWorkEmail(email)) {
+        showToast('Use your @sojern.com or @rategain.com work email', 'error');
+        return;
+    }
+
+    const originalText = btn?.textContent;
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Sending…';
+    }
+
+    try {
+        const message = await requestEditLink(email, publishState.slug || undefined);
+        showToast(message, 'success');
+        hideMobileEditorGate();
+        showHome();
+        window.history.replaceState({}, '', window.location.pathname);
+    } catch (error) {
+        showToast(error.message || 'Could not send edit link', 'error');
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = originalText;
+        }
+    }
+}
+
 function bindDownloadMenu() {
     downloadBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         downloadDropdown.classList.toggle('open');
     });
-    document.addEventListener('click', () => downloadDropdown.classList.remove('open'));
+    document.addEventListener('click', () => {
+        downloadDropdown.classList.remove('open');
+        closeNavMenu();
+    });
     downloadMenu.addEventListener('click', (e) => e.stopPropagation());
 }
 
@@ -510,6 +602,15 @@ function showTemplateSelection(email) {
 }
 
 function proceedToEditor() {
+    if (shouldShowMobileEditorGate()) {
+        showMobileEditorGate();
+        return;
+    }
+    enterEditor();
+}
+
+function enterEditor() {
+    closeNavMenu();
     homeSection.classList.add('hidden');
     templateSelectionSection.classList.add('hidden');
     editorSection.classList.remove('hidden');

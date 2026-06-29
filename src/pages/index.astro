@@ -31,7 +31,15 @@
                 <img class="logo-image logo-light" src="/business-card/Assets/DigiCard-Logo_Light.png" alt="Sojern DigiCard" width="300" height="41">
                 <img class="logo-image logo-dark" src="/business-card/Assets/DigiCard-Logo_Dark.png" alt="Sojern DigiCard" width="300" height="41">
             </div>
-            <nav class="nav">
+            <nav class="nav" id="mainNav">
+                <button type="button" class="nav-menu-toggle" id="navMenuToggle" aria-expanded="false" aria-controls="navMenuPanel" aria-label="Open menu">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <line x1="3" y1="6" x2="21" y2="6"/>
+                        <line x1="3" y1="12" x2="21" y2="12"/>
+                        <line x1="3" y1="18" x2="21" y2="18"/>
+                    </svg>
+                </button>
+                <div class="nav-menu-panel" id="navMenuPanel">
                 <button class="btn btn-secondary hidden" id="startOverBtn">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
@@ -88,6 +96,7 @@
                             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
                         </svg>
                     </div>
+                </div>
                 </div>
             </nav>
         </header>
@@ -248,6 +257,18 @@
             <button type="button" class="modal-close" id="closeHomeModal" aria-label="Close">&times;</button>
             <h2 class="modal-title">Add to Home Screen</h2>
             <div id="homeScreenGuideModalMount"></div>
+        </div>
+    </div>
+
+    <!-- Mobile editor recommendation -->
+    <div class="modal-overlay hidden" id="mobileEditorGate">
+        <div class="modal-card mobile-editor-gate-card">
+            <h2 class="modal-title">Best on desktop</h2>
+            <p class="modal-text">For ease of use, we recommend accessing the editor on a desktop device.</p>
+            <div class="mobile-editor-gate-actions">
+                <button type="button" class="btn btn-primary" id="mobileEditorProceedBtn">Proceed anyway</button>
+                <button type="button" class="mobile-editor-gate-link" id="mobileEditorEmailLinkBtn">I'll switch to desktop — email me a new link</button>
+            </div>
         </div>
     </div>
 
