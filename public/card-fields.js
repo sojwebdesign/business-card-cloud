@@ -3,9 +3,21 @@
  * Each field drives form UI, validation, and vCard export.
  */
 window.CardFields = {
-    COMPANY_NAME: 'Sojern',
-    COMPANY_URL_DEFAULT: 'www.sojern.com',
+    ALLOWED_EMAIL_DOMAINS: ['sojern.com', 'rategain.com'],
     NONE_LABEL: 'None',
+
+    getTemplateBrand(templateId) {
+        const template = window.CardTemplates?.getTemplate(templateId);
+        return {
+            companyName: template?.companyName || 'Sojern',
+            companyUrlDefault: template?.companyUrlDefault || 'www.sojern.com'
+        };
+    },
+
+    isAllowedWorkEmail(email) {
+        const domain = String(email || '').split('@')[1]?.toLowerCase().trim();
+        return Boolean(domain && this.ALLOWED_EMAIL_DOMAINS.includes(domain));
+    },
 
     showContactLabel(label) {
         return Boolean(label && label !== this.NONE_LABEL);
@@ -40,7 +52,7 @@ window.CardFields = {
             required: true,
             alwaysOn: true,
             section: 'required',
-            placeholder: 'name@sojern.com',
+            placeholder: 'name@sojern.com or name@rategain.com',
             inputType: 'email',
             labelOptions: ['Work', 'Personal', 'None'],
             defaultLabel: 'Work',
@@ -59,7 +71,7 @@ window.CardFields = {
             label: 'Company',
             type: 'fixed',
             alwaysOn: true,
-            fixedValue: 'Sojern',
+            fixedValue: null,
             showOnCard: true,
             vcard: 'ORG'
         },
@@ -80,8 +92,8 @@ window.CardFields = {
             optional: true,
             defaultEnabled: true,
             section: 'optional',
-            placeholder: 'www.sojern.com',
-            defaultValue: 'www.sojern.com',
+            placeholder: 'www.example.com',
+            defaultValue: '',
             defaultDisplay: 'Visit our website',
             icon: 'website',
             vcard: 'URL'
@@ -168,16 +180,17 @@ window.CardFields = {
         return !cardData?.hideHeadshot;
     },
 
-    createDefaultCardData() {
+    createDefaultCardData(templateId = 'sojern') {
+        const brand = this.getTemplateBrand(templateId);
         const data = {
-            templateId: 'sojern',
+            templateId,
             fullName: '',
             jobTitle: '',
             photoDataUrl: null,
             photoSourceUrl: null,
             photoCrop: null,
             hideHeadshot: false,
-            company: this.COMPANY_NAME,
+            company: brand.companyName,
             enabled: {}
         };
 
@@ -199,8 +212,9 @@ window.CardFields = {
                 } else if (field.type === 'contact') {
                     data[field.id] = { value: '', label: field.defaultLabel };
                 } else if (field.type === 'link') {
+                    const defaultUrl = field.id === 'companyUrl' ? brand.companyUrlDefault : (field.defaultValue || '');
                     data[field.id] = {
-                        value: field.defaultValue || '',
+                        value: defaultUrl,
                         displayMode: 'custom',
                         customLabel: field.defaultDisplay || ''
                     };

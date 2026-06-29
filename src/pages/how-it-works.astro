@@ -37,7 +37,7 @@ import { APP_NAME } from '../lib/brand-assets';
         <main class="help-main">
             <header class="help-header" id="help-top">
                 <h1 class="help-title">How it works</h1>
-                <p class="help-intro">Everything you need to create, share, and manage your Sojern DigiCard — from first-time setup to using your QR code at events.</p>
+                <p class="help-intro">Everything you need to create, share, and manage your DigiCard — for Sojern and RateGain team members — from first-time setup to using your QR code at events.</p>
                 <p class="help-cta-wrap help-cta-wrap--top">
                     <a href="/business-card/" class="btn btn-outline-brand">Open DigiCard builder</a>
                 </p>
@@ -47,6 +47,7 @@ import { APP_NAME } from '../lib/brand-assets';
                 <p class="help-toc-label">Jump to</p>
                 <ul class="help-toc-list">
                     <li><a href="#getting-started">Getting started</a></li>
+                    <li><a href="#templates">Card templates</a></li>
                     <li><a href="#two-links">My card vs. contact page</a></li>
                     <li><a href="#events">Using your card at events</a></li>
                     <li><a href="#qr-scan">What people see when they scan</a></li>
@@ -65,8 +66,8 @@ import { APP_NAME } from '../lib/brand-assets';
                     <div class="help-faq-body">
                         <ol>
                             <li>Open the <a href="/business-card/">DigiCard builder</a> on your computer (desktop works best).</li>
-                            <li>Enter your <strong>name</strong>, <strong>job title</strong>, and <strong>work email</strong>.</li>
-                            <li>Choose the <strong>Sojern Branded</strong> template and continue to the editor.</li>
+                            <li>Enter your <strong>name</strong>, <strong>job title</strong>, and <strong>work email</strong> (<strong>@sojern.com</strong> or <strong>@rategain.com</strong>).</li>
+                            <li>Choose a card template — <strong>Sojern Branded</strong> or <strong>RateGain Branded</strong> — then continue to the editor.</li>
                             <li>Turn contact fields on or off (phone, LinkedIn, Calendly, address, etc.) and preview your card on the right. Optionally upload a headshot in the <strong>Headshot</strong> section — or check <strong>Do not display headshot</strong> to show only the branded background image.</li>
                             <li>Click <strong>Publish Card</strong> in the Share menu (top right). Your card is saved online and you get two links:
                                 <ul>
@@ -76,7 +77,27 @@ import { APP_NAME } from '../lib/brand-assets';
                             </li>
                             <li>On your phone, open your <strong>My card</strong> link and add it to your Home Screen (see <a href="#home-screen">Add to Home Screen</a> below).</li>
                         </ol>
-                        <p class="help-note">Use your real <strong>@sojern.com</strong> email — you'll need inbox access later to request secure edit or delete links.</p>
+                        <p class="help-note">Use your real <strong>@sojern.com</strong> or <strong>@rategain.com</strong> email — you'll need inbox access later to request secure edit or delete links.</p>
+                        <p class="help-back-top"><a href="#help-top">Back to top</a></p>
+                    </div>
+                </details>
+
+                <details class="help-faq-item" id="templates">
+                    <summary>Card templates — Sojern vs. RateGain</summary>
+                    <div class="help-faq-body">
+                        <p>When you create a card, you pick one of two branded templates. Your choice sets the company name, colors, header image, and default website on the card.</p>
+                        <dl class="help-def-list">
+                            <dt>Sojern Branded</dt>
+                            <dd>
+                                Sojern header image, orange accent color, and <strong>Sojern</strong> as the company name. Default website: <strong>www.sojern.com</strong>.
+                            </dd>
+                            <dt>RateGain Branded</dt>
+                            <dd>
+                                RateGain header image, purple accent color (<code>#8012FF</code>), Manrope typography, and <strong>RateGain</strong> as the company name. Default website: <strong>www.rategain.com</strong>.
+                            </dd>
+                        </dl>
+                        <p>You can switch templates before publishing using <strong>Change Template</strong> in the editor. After publish, the template is shown as a label when you look up your card via <strong>Find my card</strong>.</p>
+                        <p class="help-note">Your work email domain does not lock you to one template — a <strong>@rategain.com</strong> address can use the Sojern template (or vice versa) if needed. DigiCard will suggest the matching template based on your email when you sign up.</p>
                         <p class="help-back-top"><a href="#help-top">Back to top</a></p>
                     </div>
                 </details>
@@ -105,7 +126,7 @@ import { APP_NAME } from '../lib/brand-assets';
                     <div class="help-faq-body">
                         <ol>
                             <li>Before the event, publish your card and add <strong>My card</strong> to your phone's Home Screen. See <a href="#home-screen">Add to Home Screen</a> for a detailed walk-through.</li>
-                            <li>At the event, open the <strong>Sojern DigiCard</strong> icon on your Home Screen — your QR code appears at the top.</li>
+                            <li>At the event, open the <strong>DigiCard</strong> icon on your Home Screen — your QR code appears at the top.</li>
                             <li>Let the other person scan the QR with their phone camera.</li>
                             <li>They land on your <strong>contact page</strong> and tap <strong>Save to Contacts</strong>.</li>
                         </ol>
@@ -124,7 +145,7 @@ import { APP_NAME } from '../lib/brand-assets';
                             <li>Tappable phone, email, and links (where you've added them)</li>
                             <li>A prominent <strong>Save to Contacts</strong> button at the top</li>
                         </ul>
-                        <p>They do <strong>not</strong> see your QR code, edit controls, or internal Sojern tools — just your contact info and a way to save it.</p>
+                        <p>They do <strong>not</strong> see your QR code, edit controls, or internal tools — just your contact info and a way to save it.</p>
                         <p class="help-back-top"><a href="#help-top">Back to top</a></p>
                     </div>
                 </details>
@@ -196,7 +217,7 @@ import { APP_NAME } from '../lib/brand-assets';
                             <li>Want a secure edit or delete link emailed to you</li>
                             <li>Need Home Screen setup steps for an existing card</li>
                         </ul>
-                        <p>Enter the <strong>work email on your card</strong>, then choose the action you need for each card listed.</p>
+                        <p>Enter the <strong>work email on your card</strong> (<strong>@sojern.com</strong> or <strong>@rategain.com</strong>), then choose the action you need for each card listed. Each result shows a <strong>template badge</strong> (Sojern Branded or RateGain Branded) so you can tell cards apart when you have more than one.</p>
                         <h3 class="help-subheading">Already have a card?</h3>
                         <p>If you start the builder with an email that's already in the system, DigiCard will warn you and show your existing card(s). You can open <strong>Find my card</strong> to edit the existing one, or choose <strong>Create another card</strong> to publish a second card with a new URL (e.g. <code>your-name-2</code>).</p>
                         <p class="help-back-top"><a href="#help-top">Back to top</a></p>
@@ -206,7 +227,7 @@ import { APP_NAME } from '../lib/brand-assets';
                 <details class="help-faq-item" id="home-screen">
                     <summary>Add to Home Screen (iPhone &amp; Android)</summary>
                     <div class="help-faq-body">
-                        <p>Add your <strong>My card</strong> page to your phone's Home Screen so you can open your QR in one tap at events. The shortcut is named <strong>Sojern DigiCard</strong>.</p>
+                        <p>Add your <strong>My card</strong> page to your phone's Home Screen so you can open your QR in one tap at events. The shortcut is named <strong>Sojern DigiCard</strong> (the app name on Design Hub).</p>
                         <h3 class="help-subheading">iPhone (Safari required)</h3>
                         <ol>
                             <li>Open your <strong>My card</strong> link in <strong>Safari</strong>.</li>
@@ -235,7 +256,7 @@ import { APP_NAME } from '../lib/brand-assets';
                         <ul>
                             <li>Removing spam or test cards from the system</li>
                             <li>Troubleshooting email delivery for edit/delete links</li>
-                            <li>Questions about Sojern branding or rollout</li>
+                            <li>Questions about Sojern or RateGain branding and rollout</li>
                         </ul>
                         <p>You can also return to the <a href="https://sojern.design">Sojern Design Hub</a> for other design resources.</p>
                         <p class="help-cta-wrap">

@@ -4,6 +4,7 @@ import {
     PublishError,
     saveCard
 } from '../../../lib/cards-store';
+import { allowedEmailError, isAllowedWorkEmail } from '../../../lib/allowed-email';
 import { getPublicOrigin } from '../../../lib/site-url';
 import type { CardData } from '../../../lib/types';
 
@@ -13,6 +14,7 @@ function validateCardData(cardData: CardData): string | null {
     if (!cardData?.fullName?.trim()) return 'Full name is required';
     if (!cardData?.jobTitle?.trim()) return 'Job title is required';
     if (!cardData?.email?.value?.trim()) return 'Email is required';
+    if (!isAllowedWorkEmail(cardData.email.value)) return allowedEmailError();
     return null;
 }
 

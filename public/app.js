@@ -133,6 +133,9 @@ function bindBasicsForm() {
         if (!fullName) return showToast('Please enter your full name', 'error');
         if (!jobTitle) return showToast('Please enter your job title', 'error');
         if (!email) return showToast('Please enter your email', 'error');
+        if (!CardFields.isAllowedWorkEmail(email)) {
+            return showToast('Use your @sojern.com or @rategain.com work email', 'error');
+        }
 
         cardData.fullName = fullName;
         cardData.jobTitle = jobTitle;
@@ -155,7 +158,7 @@ function bindBasicsForm() {
                 showDuplicateEmailModal(duplicateCheck, email);
                 return;
             }
-            showTemplateSelection();
+            showTemplateSelection(email);
         } catch (error) {
             showToast(error.message || 'Could not verify email', 'error');
         } finally {
@@ -168,7 +171,10 @@ function bindBasicsForm() {
 
 function bindNavigation() {
     document.getElementById('templateBackBtn').addEventListener('click', showHome);
-    document.getElementById('templateContinueBtn').addEventListener('click', proceedToEditor);
+    document.getElementById('templateContinueBtn').addEventListener('click', () => {
+        applyTemplateBrand(currentTemplate);
+        proceedToEditor();
+    });
     startOverBtn.addEventListener('click', resetApp);
 }
 
@@ -229,24 +235,46 @@ function renderTemplateGrid() {
             templateGrid.querySelectorAll('.template-option').forEach((el) => el.classList.remove('selected'));
             btn.classList.add('selected');
             currentTemplate = tpl.id;
-            cardData.templateId = tpl.id;
+            applyTemplateBrand(tpl.id);
         });
         templateGrid.appendChild(btn);
     });
 }
 
+function applyTemplateBrand(templateId) {
+    const brand = CardFields.getTemplateBrand(templateId);
+    currentTemplate = templateId;
+    cardData.templateId = templateId;
+    cardData.company = brand.companyName;
+    if (cardData.companyUrl) {
+        cardData.companyUrl.value = brand.companyUrlDefault;
+    }
+    if (editorSection && !editorSection.classList.contains('hidden')) {
+        buildFieldEditor();
+        renderCardPreview();
+    }
+}
+
+function suggestTemplateFromEmail(email) {
+    const domain = String(email || '').split('@')[1]?.toLowerCase().trim();
+    if (domain === 'rategain.com') return 'rategain';
+    if (domain === 'sojern.com') return 'sojern';
+    return currentTemplate;
+}
+
 function buildFieldEditor() {
     fieldEditor.innerHTML = '';
+    const companyName = CardTemplates.getTemplate(currentTemplate).companyName;
 
     const headerSection = document.createElement('div');
     headerSection.className = 'sidebar-section effect-header-section';
     headerSection.innerHTML = `
         <h2 class="sidebar-title-large">Customize Card</h2>
-        <p class="sidebar-description">Toggle optional fields and edit labels. Company is always Sojern.</p>
+        <p class="sidebar-description">Toggle optional fields and edit labels. Company is always ${companyName}.</p>
         <button type="button" class="btn btn-secondary change-effect-btn" id="changeTemplateBtn">
             Change Template
         </button>`;
-    headerSection.querySelector('#changeTemplateBtn').addEventListener('click', showTemplateSelection);
+    headerSection.querySelector('#changeTemplateBtn').addEventListener('click', () => showTemplateSelection());
 
     const requiredSection = document.createElement('div');
     requiredSection.className = 'sidebar-section';
@@ -467,13 +495,18 @@ function syncBasicsFormFromData() {
     document.getElementById('email').value = cardData.email?.value || '';
 }
 
-function showTemplateSelection() {
+function showTemplateSelection(email) {
     homeSection.classList.add('hidden');
     templateSelectionSection.classList.remove('hidden');
     editorSection.classList.add('hidden');
     document.body.classList.remove('editor-open');
     startOverBtn.classList.add('hidden');
     downloadDropdown.classList.add('hidden');
+    if (email) {
+        currentTemplate = suggestTemplateFromEmail(email);
+        applyTemplateBrand(currentTemplate);
+    }
+    renderTemplateGrid();
 }
 
 function proceedToEditor() {
@@ -491,8 +524,8 @@ function proceedToEditor() {
 }
 
 function clearAppState() {
-    cardData = CardFields.createDefaultCardData();
     currentTemplate = 'sojern';
+    cardData = CardFields.createDefaultCardData(currentTemplate);
     publishState = { slug: null, editKey: null, shareUrl: null, contactUrl: null, editUrl: null, published: false };
     duplicateCreateConfirmed = false;
     duplicateConfirmedForEmail = null;
@@ -802,6 +835,11 @@ async function checkEmailForDuplicates(email, fullName) {
     return result;
 }
 
+function templateBadgeHtml(card) {
+    const label = card.templateLabel || CardTemplates.getTemplate(card.templateId).name;
+    return CardTemplates.getTemplateBadgeHtml(card.templateId || 'sojern', escapeHtml(label));
+}
+
 function showDuplicateEmailModal(check, email, options = {}) {
     const modal = document.getElementById('duplicateEmailModal');
     const listEl = document.getElementById('duplicateEmailList');
@@ -811,7 +849,10 @@ function showDuplicateEmailModal(check, email, options = {}) {
     if (listEl) {
         listEl.innerHTML = check.cards.map((card) => `
             <div class="duplicate-email-item">
-                <h3>${escapeHtml(card.fullName)}</h3>
+                <div class="recover-card-header">
+                    <h3>${escapeHtml(card.fullName)}</h3>
+                    ${templateBadgeHtml(card)}
+                </div>
                 <p>${escapeHtml(card.jobTitle)}</p>
                 <p><code>${escapeHtml(card.slug)}</code> · Last edited ${escapeHtml(formatRecoverTimestamp(card.updatedAt))}</p>
             </div>`).join('');
@@ -858,7 +899,7 @@ function bindDuplicateEmailModal() {
             return;
         }
 
-        showTemplateSelection();
+        showTemplateSelection(pending?.email);
     });
 }
 
@@ -1044,6 +1085,9 @@ function bindRecoverModal() {
     recoverForm?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const email = document.getElementById('recoverEmail').value.trim();
+        if (!CardFields.isAllowedWorkEmail(email)) {
+            return showToast('Use your @sojern.com or @rategain.com work email', 'error');
+        }
         const resultsEl = document.getElementById('recoverResults');
         const submitBtn = recoverForm.querySelector('button[type="submit"]');
         submitBtn.disabled = true;
@@ -1065,7 +1109,10 @@ function bindRecoverModal() {
                 const item = document.createElement('div');
                 item.className = 'recover-card-item';
                 item.innerHTML = `
-                    <h3>${escapeHtml(card.fullName)}</h3>
+                    <div class="recover-card-header">
+                        <h3>${escapeHtml(card.fullName)}</h3>
+                        ${templateBadgeHtml(card)}
+                    </div>
                     <p class="recover-card-meta">${escapeHtml(card.jobTitle)}</p>
                     <p class="recover-card-meta">Last edited: ${escapeHtml(formatRecoverTimestamp(card.updatedAt))}</p>
                     <p class="recover-card-slug"><span class="recover-card-label">URL slug</span> <code>${escapeHtml(card.slug)}</code></p>
@@ -1211,7 +1258,7 @@ function downloadVcf() {
 }
 
 function buildVCard() {
-    const lines = ['BEGIN:VCARD', 'VERSION:3.0', `FN:${cardData.fullName}`, `TITLE:${cardData.jobTitle}`, `ORG:${CardFields.COMPANY_NAME}`];
+    const lines = ['BEGIN:VCARD', 'VERSION:3.0', `FN:${cardData.fullName}`, `TITLE:${cardData.jobTitle}`, `ORG:${cardData.company || CardTemplates.getTemplate(currentTemplate).companyName}`];
     const contactType = (label) => (CardFields.showContactLabel(label) ? `;TYPE=${label}` : '');
     if (cardData.email?.value) lines.push(`EMAIL${contactType(cardData.email.label)}:${cardData.email.value}`);
     if (cardData.enabled.phone && cardData.phone?.value) lines.push(`TEL${contactType(cardData.phone.label)}:${cardData.phone.value}`);

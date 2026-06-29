@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { findCardsByEmail, getCardsKV, PublishError } from '../../../lib/cards-store';
+import { allowedEmailError, isAllowedWorkEmail } from '../../../lib/allowed-email';
 import { createDeleteLink } from '../../../lib/delete-link';
 import { sendDeleteLinkEmail } from '../../../lib/delete-link-email';
 import { enforceRateLimit, getClientIp, RateLimitError } from '../../../lib/rate-limit';
@@ -17,6 +18,9 @@ export const POST: APIRoute = async ({ request, locals, url }) => {
 
         if (!email || !email.includes('@')) {
             return json({ error: 'A valid email is required' }, 400);
+        }
+        if (!isAllowedWorkEmail(email)) {
+            return json({ error: allowedEmailError() }, 400);
         }
 
         const kv = getCardsKV(locals);

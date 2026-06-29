@@ -1,6 +1,8 @@
 import type { APIRoute } from 'astro';
 import { buildCardUrls, findCardsByEmail, getCardsKV } from '../../../lib/cards-store';
+import { allowedEmailError, isAllowedWorkEmail } from '../../../lib/allowed-email';
 import { enforceRateLimit, getClientIp, RateLimitError } from '../../../lib/rate-limit';
+import { getTemplateLabel } from '../../../lib/template-labels';
 import { getPublicOrigin } from '../../../lib/site-url';
 
 export const prerender = false;
@@ -12,6 +14,9 @@ export const POST: APIRoute = async ({ request, locals, url }) => {
 
         if (!email || !email.includes('@')) {
             return json({ error: 'A valid email is required' }, 400);
+        }
+        if (!isAllowedWorkEmail(email)) {
+            return json({ error: allowedEmailError() }, 400);
         }
 
         const kv = getCardsKV(locals);
@@ -31,6 +36,8 @@ export const POST: APIRoute = async ({ request, locals, url }) => {
                 slug: card.slug,
                 fullName: card.cardData.fullName,
                 jobTitle: card.cardData.jobTitle,
+                templateId: card.templateId,
+                templateLabel: getTemplateLabel(card.templateId),
                 updatedAt: card.updatedAt,
                 shareUrl: buildCardUrls(origin, card.slug, card.editKey).shareUrl,
                 contactUrl: buildCardUrls(origin, card.slug, card.editKey).contactUrl

@@ -6,12 +6,25 @@ window.CardTemplates = {
         sojern: {
             id: 'sojern',
             name: 'Sojern Branded',
+            companyName: 'Sojern',
+            companyUrlDefault: 'www.sojern.com',
             className: 'card-template-sojern',
             thumbClass: 'template-thumb-sojern',
             /** Cover: 1200×600 (2:1) */
             headerImage: '/business-card/Assets/card-header.png',
             headerPlaceholder: '/business-card/Assets/card-header-placeholder.svg',
             headerFallback: 'linear-gradient(135deg, #3d1f6e 0%, #6b2d9e 50%, #8012ff 100%)'
+        },
+        rategain: {
+            id: 'rategain',
+            name: 'RateGain Branded',
+            companyName: 'RateGain',
+            companyUrlDefault: 'www.rategain.com',
+            className: 'card-template-rategain',
+            thumbClass: 'template-thumb-rategain',
+            headerImage: '/business-card/Assets/card-header-rategain.svg',
+            headerPlaceholder: '/business-card/Assets/card-header-placeholder.svg',
+            headerFallback: 'linear-gradient(135deg, #4a0d99 0%, #8012ff 100%)'
         }
     },
 
@@ -23,9 +36,21 @@ window.CardTemplates = {
         return Object.values(this.registry);
     },
 
+    getCompanyName(templateId, cardData) {
+        if (cardData?.company) return cardData.company;
+        return this.getTemplate(templateId).companyName;
+    },
+
+    getTemplateBadgeHtml(templateId, label) {
+        const template = this.getTemplate(templateId);
+        const id = template.id;
+        const name = label || template.name;
+        return `<span class="card-template-badge card-template-badge--${id}">${name}</span>`;
+    },
+
     renderThumb(container, templateId) {
         const template = this.getTemplate(templateId);
-        container.className = 'template-thumb-card';
+        container.className = `template-thumb-card ${template.thumbClass || ''}`.trim();
         container.innerHTML = `
             <div class="template-thumb-card__header"></div>
             <div class="template-thumb-card__content">
@@ -162,7 +187,7 @@ window.CardTemplates = {
 
         const company = document.createElement('p');
         company.className = 'sojern-card__company';
-        company.textContent = fields.COMPANY_NAME;
+        company.textContent = this.getCompanyName(templateId, cardData);
 
         identity.appendChild(name);
         identity.appendChild(title);

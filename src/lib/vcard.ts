@@ -1,6 +1,5 @@
 import type { CardData } from './types';
 
-const COMPANY_NAME = 'Sojern';
 const NONE_LABEL = 'None';
 
 function contactTypeParam(label: string | undefined): string {
@@ -67,7 +66,7 @@ export function buildVCard(cardData: CardData, options: VCardOptions = {}): stri
         foldLine(`N:${escapeVCard(family)};${escapeVCard(given)};;;`),
         `FN:${escapeVCard(cardData.fullName)}`,
         `TITLE:${escapeVCard(cardData.jobTitle)}`,
-        `ORG:${COMPANY_NAME}`
+        `ORG:${escapeVCard(cardData.company || 'Sojern')}`
     ];
 
     if (options.slug) {
