@@ -3324,6 +3324,28 @@ a.sojern-card__contact-link:focus-visible {
     color: var(--brand-primary-dark, #c44f32);
 }
 
+/* RateGain public card pages — purple CTAs */
+.public-card-page--rategain .btn-primary {
+    background: #8012ff;
+}
+
+.public-card-page--rategain .btn-primary:hover {
+    background: #6b10db;
+}
+
+.public-card-page--rategain .btn-primary:focus-visible {
+    outline-color: #8012ff;
+}
+
+.public-card-page--rategain .share-home-link {
+    color: #8012ff;
+}
+
+.public-card-page--rategain .share-home-link:hover,
+.public-card-page--rategain .share-home-link:focus-visible {
+    color: #6b10db;
+}
+
 /* ─── Photo crop modal ─── */
 
 .modal-card--crop {

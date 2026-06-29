@@ -39,7 +39,7 @@ const fullName = card.cardData.fullName;
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/business-card/styles.css">
 </head>
-<body class="public-card-page contact-card-page">
+<body class={`public-card-page contact-card-page${templateId === 'rategain' ? ' public-card-page--rategain' : ''}`}>
     <main class="public-card-main">
         <div class="public-card-actions public-card-actions--top">
             <button type="button" class="btn btn-primary public-card-save" id="saveContactBtn">
