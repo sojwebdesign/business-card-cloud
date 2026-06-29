@@ -1,11 +1,16 @@
 let adminKey = '';
 let nextCursor = null;
+let templateFilter = '';
+let searchQuery = '';
+let searchDebounceTimer = null;
 
 const authForm = document.getElementById('adminAuthForm');
 const statusEl = document.getElementById('adminStatus');
 const tableWrap = document.getElementById('adminTableWrap');
 const tableBody = document.getElementById('adminTableBody');
 const loadMoreBtn = document.getElementById('loadMoreCardsBtn');
+const templateFilterEl = document.getElementById('adminTemplateFilter');
+const searchInputEl = document.getElementById('adminSearch');
 
 authForm?.addEventListener('submit', async (event) => {
     event.preventDefault();
@@ -16,6 +21,36 @@ authForm?.addEventListener('submit', async (event) => {
 });
 
 loadMoreBtn?.addEventListener('click', () => loadCards(true));
+
+templateFilterEl?.addEventListener('change', async () => {
+    templateFilter = templateFilterEl.value || '';
+    if (!adminKey) return;
+    await reloadCards();
+});
+
+searchInputEl?.addEventListener('input', () => {
+    searchQuery = searchInputEl.value.trim();
+    if (!adminKey) return;
+    window.clearTimeout(searchDebounceTimer);
+    searchDebounceTimer = window.setTimeout(() => {
+        reloadCards();
+    }, 350);
+});
+
+searchInputEl?.addEventListener('keydown', (event) => {
+    if (event.key !== 'Enter') return;
+    event.preventDefault();
+    searchQuery = searchInputEl.value.trim();
+    if (!adminKey) return;
+    window.clearTimeout(searchDebounceTimer);
+    reloadCards();
+});
+
+async function reloadCards() {
+    tableBody.innerHTML = '';
+    nextCursor = null;
+    await loadCards(false);
+}
 
 async function loadCards(append) {
     const btn = document.getElementById('loadCardsBtn');
@@ -34,7 +69,9 @@ async function loadCards(append) {
             body: JSON.stringify({
                 adminKey,
                 cursor: append ? nextCursor : undefined,
-                limit: 50
+                limit: 50,
+                templateId: templateFilter || undefined,
+                search: searchQuery || undefined
             })
         });
         const result = await response.json();
@@ -46,7 +83,7 @@ async function loadCards(append) {
         nextCursor = result.cursor || null;
         tableWrap?.classList.remove('hidden');
         loadMoreBtn?.classList.toggle('hidden', !nextCursor);
-        setStatus(`${tableBody.children.length} card${tableBody.children.length === 1 ? '' : 's'} loaded`);
+        setStatus(statusMessage(tableBody.children.length, templateFilter, searchQuery));
     } catch (error) {
         setStatus(error.message || 'Could not load cards', true);
     } finally {
@@ -57,18 +94,66 @@ async function loadCards(append) {
     }
 }
 
+function statusMessage(count, filter, search) {
+    const noun = `${count} card${count === 1 ? '' : 's'} loaded`;
+    const parts = [noun];
+
+    if (search) parts.push(`matching “${search}”`);
+    if (filter === 'sojern') parts.push('Sojern Branded');
+    if (filter === 'rategain') parts.push('RateGain Branded');
+
+    return parts.join(' · ');
+}
+
+function templateBadgeHtml(card) {
+    const id = card.templateId || 'sojern';
+    const label = escapeHtml(card.templateLabel || 'Sojern Branded');
+    return `<span class="card-template-badge card-template-badge--${id}">${label}</span>`;
+}
+
 function renderRow(card) {
     const row = document.createElement('tr');
     row.innerHTML = `
         <td>${escapeHtml(card.fullName)}<div class="admin-row-meta">${escapeHtml(card.jobTitle)}</div></td>
         <td>${escapeHtml(card.email || '—')}</td>
+        <td>${templateBadgeHtml(card)}</td>
         <td><code>${escapeHtml(card.slug)}</code></td>
         <td>${escapeHtml(formatDate(card.updatedAt))}</td>
-        <td class="admin-actions"><button type="button" class="btn btn-secondary btn-danger btn-sm">Delete</button></td>`;
+        <td class="admin-actions">
+            <button type="button" class="btn btn-secondary btn-sm" data-action="send-edit">Send edit link</button>
+            <button type="button" class="btn btn-secondary btn-danger btn-sm" data-action="delete">Delete</button>
+        </td>`;
 
-    row.querySelector('button')?.addEventListener('click', async () => {
+    row.querySelector('[data-action="send-edit"]')?.addEventListener('click', async (event) => {
+        const btn = event.currentTarget;
+        const email = card.email || 'the address on this card';
+        if (!confirm(`Send a one-time edit link to ${card.fullName} at ${email}?`)) return;
+
+        const originalText = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = 'Sending…';
+
+        try {
+            const response = await fetch('/business-card/api/admin/cards/send-edit-link', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ adminKey, slug: card.slug })
+            });
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.error || 'Could not send edit link');
+            showToast(result.message || 'Edit link sent', 'success');
+        } catch (error) {
+            showToast(error.message || 'Could not send edit link', 'error');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = originalText;
+        }
+    });
+
+    row.querySelector('[data-action="delete"]')?.addEventListener('click', async (event) => {
+        const btn = event.currentTarget;
         if (!confirm(`Delete ${card.fullName} (${card.slug})? This cannot be undone.`)) return;
-        const btn = row.querySelector('button');
+
         btn.disabled = true;
         btn.textContent = 'Deleting…';
 
@@ -82,7 +167,7 @@ function renderRow(card) {
             if (!response.ok) throw new Error(result.error || 'Delete failed');
             row.remove();
             showToast('Card deleted', 'success');
-            setStatus(`${tableBody.children.length} card${tableBody.children.length === 1 ? '' : 's'} loaded`);
+            setStatus(statusMessage(tableBody.children.length, templateFilter, searchQuery));
         } catch (error) {
             showToast(error.message || 'Could not delete card', 'error');
             btn.disabled = false;

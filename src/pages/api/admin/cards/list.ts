@@ -11,7 +11,9 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
         const cursor = typeof body?.cursor === 'string' ? body.cursor : undefined;
         const limit = typeof body?.limit === 'number' ? body.limit : undefined;
-        const result = await listAllCards(locals, { cursor, limit });
+        const templateId = typeof body?.templateId === 'string' ? body.templateId.trim() : undefined;
+        const search = typeof body?.search === 'string' ? body.search.trim() : undefined;
+        const result = await listAllCards(locals, { cursor, limit, templateId, search });
 
         return json(result);
     } catch (error) {

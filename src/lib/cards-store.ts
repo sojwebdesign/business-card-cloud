@@ -1,6 +1,7 @@
 import type { PublishedCard, CardData } from './types';
 import { resolveUniqueSlug } from './slug';
 import { isReservedSlug } from './reserved-slugs';
+import { getTemplateLabel } from './template-labels';
 
 const KV_PREFIX = 'card:';
 const EMAIL_INDEX_PREFIX = 'email-index:';
@@ -195,30 +196,109 @@ export interface AdminCardSummary {
     fullName: string;
     jobTitle: string;
     email: string;
+    templateId: string;
+    templateLabel: string;
     publishedAt: string;
     updatedAt: string;
 }
 
+function toAdminCardSummary(card: PublishedCard): AdminCardSummary {
+    const templateId = card.templateId || 'sojern';
+    return {
+        slug: card.slug,
+        fullName: card.cardData.fullName || '',
+        jobTitle: card.cardData.jobTitle || '',
+        email: card.cardData.email?.value?.toLowerCase().trim() || '',
+        templateId,
+        templateLabel: getTemplateLabel(templateId),
+        publishedAt: card.publishedAt,
+        updatedAt: card.updatedAt
+    };
+}
+
+async function listAllCardKeys(kv: KVNamespace): Promise<string[]> {
+    const keys: string[] = [];
+    let cursor: string | undefined;
+
+    do {
+        const list = await kv.list({ prefix: KV_PREFIX, cursor, limit: 1000 });
+        keys.push(...list.keys.map((key) => key.name));
+        cursor = list.list_complete ? undefined : list.cursor;
+    } while (cursor);
+
+    return keys;
+}
+
+function matchesAdminSearch(card: AdminCardSummary, query: string): boolean {
+    const normalized = query.trim().toLowerCase();
+    if (!normalized) return true;
+    return card.fullName.toLowerCase().includes(normalized)
+        || card.email.toLowerCase().includes(normalized);
+}
+
+async function listFilteredAdminCards(
+    kv: KVNamespace,
+    options: { cursor?: string; limit: number; templateId?: string; search?: string }
+): Promise<{ cards: AdminCardSummary[]; cursor?: string }> {
+    const keyNames = await listAllCardKeys(kv);
+    const cards: AdminCardSummary[] = [];
+    const templateFilter =
+        options.templateId === 'sojern' || options.templateId === 'rategain'
+            ? options.templateId
+            : undefined;
+    const searchQuery = options.search?.trim() || '';
+
+    for (const keyName of keyNames) {
+        const card = await kv.get<PublishedCard>(keyName, 'json');
+        if (!card) continue;
+
+        const summary = toAdminCardSummary(card);
+        if (templateFilter && summary.templateId !== templateFilter) continue;
+        if (!matchesAdminSearch(summary, searchQuery)) continue;
+        cards.push(summary);
+    }
+
+    cards.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+
+    const offset = options.cursor ? Number.parseInt(options.cursor, 10) : 0;
+    const start = Number.isFinite(offset) && offset > 0 ? offset : 0;
+    const page = cards.slice(start, start + options.limit);
+    const nextOffset = start + options.limit;
+
+    return {
+        cards: page,
+        cursor: nextOffset < cards.length ? String(nextOffset) : undefined
+    };
+}
+
 export async function listAllCards(
     locals: App.Locals,
-    options?: { cursor?: string; limit?: number }
+    options?: { cursor?: string; limit?: number; templateId?: string; search?: string }
 ): Promise<{ cards: AdminCardSummary[]; cursor?: string }> {
     const kv = getCardsKV(locals);
     const limit = Math.min(Math.max(options?.limit || 50, 1), 100);
-    const list = await kv.list({ prefix: KV_PREFIX, cursor: options?.cursor, limit });
+    const templateFilter =
+        options?.templateId === 'sojern' || options?.templateId === 'rategain'
+            ? options.templateId
+            : undefined;
+    const searchQuery = options?.search?.trim() || '';
 
+    if (templateFilter || searchQuery) {
+        return listFilteredAdminCards(kv, {
+            cursor: options?.cursor,
+            limit,
+            templateId: templateFilter,
+            search: searchQuery
+        });
+    }
+
+    const list = await kv.list({ prefix: KV_PREFIX, cursor: options?.cursor, limit });
     const cards: AdminCardSummary[] = [];
+
     for (const key of list.keys) {
         const card = await kv.get<PublishedCard>(key.name, 'json');
         if (!card) continue;
-        cards.push({
-            slug: card.slug,
-            fullName: card.cardData.fullName || '',
-            jobTitle: card.cardData.jobTitle || '',
-            email: card.cardData.email?.value?.toLowerCase().trim() || '',
-            publishedAt: card.publishedAt,
-            updatedAt: card.updatedAt
-        });
+        cards.push(toAdminCardSummary(card));
     }
 
     cards.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));

@@ -3503,7 +3503,7 @@ a.sojern-card__contact-link:focus-visible {
 }
 
 .admin-page .admin-main {
-    max-width: 1100px;
+    max-width: 1200px;
     margin: 0 auto;
     padding: var(--space-6) var(--space-4) var(--space-8);
 }
@@ -3544,6 +3544,60 @@ a.sojern-card__contact-link:focus-visible {
     overflow-x: auto;
 }
 
+.admin-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    align-items: flex-end;
+    margin-bottom: var(--space-4);
+}
+
+.admin-filter {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    min-width: 200px;
+}
+
+.admin-filter--search {
+    flex: 1 1 280px;
+    max-width: 360px;
+}
+
+.admin-filter-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.admin-filter-select {
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    color: var(--text-primary);
+    background: var(--bg-white);
+}
+
+.admin-filter-input {
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    color: var(--text-primary);
+    background: var(--bg-white);
+}
+
+.admin-filter-input:focus {
+    outline: none;
+    border-color: var(--brand-primary);
+    box-shadow: 0 0 0 3px rgba(227, 95, 62, 0.12);
+}
+
 .admin-table {
     width: 100%;
     border-collapse: collapse;
@@ -3571,6 +3625,14 @@ a.sojern-card__contact-link:focus-visible {
 
 .admin-actions {
     white-space: nowrap;
+}
+
+.admin-actions .btn {
+    margin-right: var(--space-2);
+}
+
+.admin-actions .btn:last-child {
+    margin-right: 0;
 }
 
 .btn-sm {

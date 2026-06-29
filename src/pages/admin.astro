@@ -41,11 +41,32 @@ import { APP_NAME } from '../lib/brand-assets';
             <div class="admin-status hidden" id="adminStatus"></div>
 
             <div class="admin-table-wrap hidden" id="adminTableWrap">
+                <div class="admin-toolbar">
+                    <label class="admin-filter admin-filter--search" for="adminSearch">
+                        <span class="admin-filter-label">Search</span>
+                        <input
+                            type="search"
+                            id="adminSearch"
+                            class="admin-filter-input"
+                            placeholder="Name or email"
+                            autocomplete="off"
+                        >
+                    </label>
+                    <label class="admin-filter" for="adminTemplateFilter">
+                        <span class="admin-filter-label">Template</span>
+                        <select id="adminTemplateFilter" class="admin-filter-select">
+                            <option value="">All templates</option>
+                            <option value="sojern">Sojern Branded</option>
+                            <option value="rategain">RateGain Branded</option>
+                        </select>
+                    </label>
+                </div>
                 <table class="admin-table">
                     <thead>
                         <tr>
                             <th>Name</th>
                             <th>Email</th>
+                            <th>Template</th>
                             <th>Slug</th>
                             <th>Updated</th>
                             <th></th>
