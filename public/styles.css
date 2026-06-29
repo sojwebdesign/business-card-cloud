@@ -3502,10 +3502,16 @@ a.sojern-card__contact-link:focus-visible {
     justify-content: flex-end;
 }
 
+.admin-page {
+    width: 100%;
+}
+
 .admin-page .admin-main {
+    width: 100%;
     max-width: 1200px;
     margin: 0 auto;
     padding: var(--space-6) var(--space-4) var(--space-8);
+    box-sizing: border-box;
 }
 
 .admin-title {
@@ -3541,6 +3547,7 @@ a.sojern-card__contact-link:focus-visible {
 }
 
 .admin-table-wrap {
+    width: 100%;
     overflow-x: auto;
 }
 
@@ -3560,8 +3567,23 @@ a.sojern-card__contact-link:focus-visible {
 }
 
 .admin-filter--search {
-    flex: 1 1 280px;
-    max-width: 360px;
+    flex: 1 1 320px;
+    max-width: 420px;
+}
+
+.admin-search-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.admin-search-row .admin-filter-input {
+    flex: 1;
+    min-width: 0;
+}
+
+.admin-search-clear {
+    flex-shrink: 0;
 }
 
 .admin-filter-label {
@@ -3600,6 +3622,7 @@ a.sojern-card__contact-link:focus-visible {
 
 .admin-table {
     width: 100%;
+    min-width: 100%;
     border-collapse: collapse;
     font-size: 0.875rem;
 }

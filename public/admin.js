@@ -11,6 +11,7 @@ const tableBody = document.getElementById('adminTableBody');
 const loadMoreBtn = document.getElementById('loadMoreCardsBtn');
 const templateFilterEl = document.getElementById('adminTemplateFilter');
 const searchInputEl = document.getElementById('adminSearch');
+const searchClearBtn = document.getElementById('adminSearchClear');
 
 authForm?.addEventListener('submit', async (event) => {
     event.preventDefault();
@@ -30,6 +31,7 @@ templateFilterEl?.addEventListener('change', async () => {
 
 searchInputEl?.addEventListener('input', () => {
     searchQuery = searchInputEl.value.trim();
+    updateSearchClearVisibility();
     if (!adminKey) return;
     window.clearTimeout(searchDebounceTimer);
     searchDebounceTimer = window.setTimeout(() => {
@@ -37,10 +39,24 @@ searchInputEl?.addEventListener('input', () => {
     }, 350);
 });
 
+searchClearBtn?.addEventListener('click', () => {
+    searchQuery = '';
+    if (searchInputEl) searchInputEl.value = '';
+    updateSearchClearVisibility();
+    if (!adminKey) return;
+    window.clearTimeout(searchDebounceTimer);
+    reloadCards();
+});
+
+function updateSearchClearVisibility() {
+    searchClearBtn?.classList.toggle('hidden', !searchQuery);
+}
+
 searchInputEl?.addEventListener('keydown', (event) => {
     if (event.key !== 'Enter') return;
     event.preventDefault();
     searchQuery = searchInputEl.value.trim();
+    updateSearchClearVisibility();
     if (!adminKey) return;
     window.clearTimeout(searchDebounceTimer);
     reloadCards();
@@ -59,6 +75,9 @@ async function loadCards(append) {
     if (btn) {
         btn.disabled = true;
         btn.textContent = 'Loading…';
+    }
+    if (!append) {
+        tableWrap?.classList.remove('hidden');
     }
     setStatus('Loading cards…');
 

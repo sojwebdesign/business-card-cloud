@@ -44,13 +44,16 @@ import { APP_NAME } from '../lib/brand-assets';
                 <div class="admin-toolbar">
                     <label class="admin-filter admin-filter--search" for="adminSearch">
                         <span class="admin-filter-label">Search</span>
-                        <input
-                            type="search"
-                            id="adminSearch"
-                            class="admin-filter-input"
-                            placeholder="Name or email"
-                            autocomplete="off"
-                        >
+                        <div class="admin-search-row">
+                            <input
+                                type="search"
+                                id="adminSearch"
+                                class="admin-filter-input"
+                                placeholder="Name or email"
+                                autocomplete="off"
+                            >
+                            <button type="button" class="btn btn-secondary btn-sm admin-search-clear hidden" id="adminSearchClear">Clear</button>
+                        </div>
                     </label>
                     <label class="admin-filter" for="adminTemplateFilter">
                         <span class="admin-filter-label">Template</span>
